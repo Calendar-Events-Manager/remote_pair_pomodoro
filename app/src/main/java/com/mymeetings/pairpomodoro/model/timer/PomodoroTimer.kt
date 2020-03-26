@@ -32,6 +32,9 @@ class PomodoroTimer(
     fun reset() {
         pause = true
         tickerRunner.cancel()
+        pomoState = PomoState.Default
+        balanceTime = timerPreference.getFocusTime()
+        shortBreaksLeft = timerPreference.getShortBreakCount()
         updateTimerInfo()
     }
 

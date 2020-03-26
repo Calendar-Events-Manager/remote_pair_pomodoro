@@ -28,4 +28,8 @@ class PomodoroViewModel : ViewModel() {
     fun reset() {
         SingletonPomodoro.reset()
     }
+
+    fun close() {
+        SingletonPomodoro.clear()
+    }
 }

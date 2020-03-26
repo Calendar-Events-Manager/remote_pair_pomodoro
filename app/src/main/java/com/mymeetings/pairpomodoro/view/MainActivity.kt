@@ -46,30 +46,42 @@ class MainActivity : AppCompatActivity() {
 
         createButton.setOnClickListener {
             pomodoroViewModel.createOwnPomodoro()
+            showTimerView(null)
         }
 
         syncButton.setOnClickListener {
             ViewUtils.buildInputDialog(this) {
                 pomodoroViewModel.syncPomodoro(it)
+                showTimerView(null)
             }
+        }
+
+        closeButton.setOnClickListener {
+            pomodoroViewModel.close()
         }
 
         //TODO start service too.
     }
 
-    private fun showTimerView(pomodoroStatus: PomodoroStatus) {
+    private fun showTimerView(pomodoroStatus: PomodoroStatus?) {
 
         timerLayout.visible()
         selectionLayout.gone()
 
-        countDownView.text = Utils.getDurationBreakdown(pomodoroStatus.balanceTime)
+        countDownView.text = Utils.getDurationBreakdown(pomodoroStatus?.balanceTime ?: 0)
 
-        if (pomodoroStatus.pause) {
+        if (pomodoroStatus == null) {
+            startButton.gone()
+            pauseResetLayout.gone()
+            progressBar.visible()
+        } else if (pomodoroStatus.pause) {
             startButton.visible()
             pauseResetLayout.gone()
+            progressBar.gone()
         } else {
             startButton.gone()
             pauseResetLayout.visible()
+            progressBar.gone()
         }
 
         if (pomodoroViewModel.pomodoroMode == PomodoroMode.CREATED) {
@@ -84,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
         sharingKeyText.text = pomodoroViewModel.sharingKey
 
-        val mode = when (pomodoroStatus.pomoState) {
+        val mode = when (pomodoroStatus?.pomoState ?: PomoState.Default) {
             PomoState.Focus -> {
                 "Focus"
             }

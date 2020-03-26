@@ -17,8 +17,8 @@ object Utils {
         return String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds)
     }
 
-    fun getRandomAlphaNumeric() : String {
-        val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz"
+    fun getRandomAlphaNumeric(): String {
+        val allowedChars = "abcdefghiklmnoprstuv"
         return (1..5)
             .map { allowedChars.random() }
             .joinToString("")

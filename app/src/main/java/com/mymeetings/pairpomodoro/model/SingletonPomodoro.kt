@@ -13,7 +13,7 @@ object SingletonPomodoro {
     var shareKey: String = ""
     var pomodoroMode = PomodoroMode.CREATED
 
-    private lateinit var pomodoroManager: PomodoroManager
+    private var pomodoroManager: PomodoroManager? = null
 
     fun createOwnPomodoro() {
         pomodoroMode = PomodoroMode.CREATED
@@ -36,15 +36,21 @@ object SingletonPomodoro {
     }
 
     fun start() {
-        pomodoroManager.start()
+        pomodoroManager?.start()
     }
 
     fun pause() {
-        pomodoroManager.pause()
+        pomodoroManager?.pause()
     }
 
     fun reset() {
-        pomodoroManager.reset()
+        pomodoroManager?.reset()
+    }
+
+    fun clear() {
+        pomodoroManager?.reset()
+        pomodoroManager = null
+        pomodoroStatusLiveData.postValue(null)
     }
 
     fun getPomodoroStatusLiveData(): LiveData<PomodoroStatus> = pomodoroStatusLiveData
@@ -52,4 +58,5 @@ object SingletonPomodoro {
     private fun update(pomodoroStatus: PomodoroStatus) {
         pomodoroStatusLiveData.postValue(pomodoroStatus)
     }
+
 }
