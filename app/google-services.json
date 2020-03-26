@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "297968412396",
+    "firebase_url": "https://pomodoro-pair.firebaseio.com",
+    "project_id": "pomodoro-pair",
+    "storage_bucket": "pomodoro-pair.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:297968412396:android:5ae2577fbdae40e9fa67c9",
+        "android_client_info": {
+          "package_name": "com.mymeetings.pairpomodoro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "297968412396-0hakbv0ufjpfuins37t5s1gv293kqr1a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8DaIkSkpdtHKHnUtKI6sgs7fknWQyC14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "297968412396-0hakbv0ufjpfuins37t5s1gv293kqr1a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
