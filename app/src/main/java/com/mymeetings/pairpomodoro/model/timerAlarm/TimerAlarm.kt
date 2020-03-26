@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.model
+package com.mymeetings.pairpomodoro.model.timerAlarm
 
 interface TimerAlarm {
 

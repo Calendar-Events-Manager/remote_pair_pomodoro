@@ -1,8 +1,8 @@
 package com.mymeetings.pairpomodoro.model.timer
 
-import com.mymeetings.pairpomodoro.model.PomoState
+import com.mymeetings.pairpomodoro.model.PomodoroStatus
 
 interface TimerUpdater {
 
-    fun update(pomoState: PomoState, balanceTime : Long, shortBreaksLeft : Int)
+    fun update(pomodoroStatus: PomodoroStatus)
 }

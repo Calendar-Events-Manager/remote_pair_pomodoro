@@ -1,7 +1,8 @@
 package com.mymeetings.pairpomodoro.model.timer
 
 import com.mymeetings.pairpomodoro.model.PomoState
-import com.mymeetings.pairpomodoro.model.TimerAlarm
+import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
 import java.util.concurrent.TimeUnit
 
@@ -15,32 +16,33 @@ class PomodoroTimer(
     private var pomoState: PomoState = PomoState.Default
     private var balanceTime: Long = timerPreference.getFocusTime()
     private var shortBreaksLeft: Int = timerPreference.getShortBreakCount()
+    private var pause: Boolean = true
 
     fun start() {
+        pause = false
         tickerRunner.run(this)
     }
 
     fun pause() {
+        pause = true
         tickerRunner.cancel()
         updateTimerInfo()
     }
 
     fun reset() {
+        pause = true
         tickerRunner.cancel()
         updateTimerInfo()
     }
 
-    fun sync(
-        balanceTime: Long,
-        pomoState: PomoState,
-        pause: Boolean
-    ) {
-        this.balanceTime = balanceTime
-        this.pomoState = pomoState
+    fun sync(pomodoroStatus: PomodoroStatus) {
+        this.balanceTime = pomodoroStatus.balanceTime
+        this.pomoState = pomodoroStatus.pomoState
+        this.shortBreaksLeft = pomodoroStatus.shortBreaksLeft
         if (pause) {
-            tickerRunner.cancel()
+            pause()
         } else {
-            tickerRunner.run(this)
+            start()
         }
     }
 
@@ -59,13 +61,13 @@ class PomodoroTimer(
 
     private fun sendAlarmForNextPomoState() {
         when (pomoState) {
-            is PomoState.ShortBreak -> {
+            PomoState.ShortBreak -> {
                 timerAlarm.alarmForShortBreak()
             }
-            is PomoState.LongBreak -> {
+            PomoState.LongBreak -> {
                 timerAlarm.alarmForLongBreak()
             }
-            is PomoState.Focus -> {
+            PomoState.Focus -> {
                 timerAlarm.alarmForBreakOver()
             }
         }
@@ -73,8 +75,8 @@ class PomodoroTimer(
 
     private fun nextPomoState() =
         when (pomoState) {
-            is PomoState.Default -> PomoState.Focus
-            is PomoState.Focus -> {
+            PomoState.Default -> PomoState.Focus
+            PomoState.Focus -> {
                 if (shortBreaksLeft > 0) {
                     shortBreaksLeft -= 1
                     balanceTime = timerPreference.getShortBreakTime()
@@ -84,15 +86,18 @@ class PomodoroTimer(
                     PomoState.LongBreak
                 }
             }
-            is PomoState.ShortBreak -> PomoState.Focus
-            is PomoState.LongBreak -> PomoState.Focus
+            PomoState.ShortBreak -> PomoState.Focus
+            PomoState.LongBreak -> PomoState.Focus
         }
 
     private fun updateTimerInfo() =
         timerUpdater.update(
-            pomoState = pomoState,
-            balanceTime = balanceTime,
-            shortBreaksLeft = shortBreaksLeft
+            PomodoroStatus(
+                pomoState = pomoState,
+                balanceTime = balanceTime,
+                shortBreaksLeft = shortBreaksLeft,
+                pause = pause
+            )
         )
 
 }

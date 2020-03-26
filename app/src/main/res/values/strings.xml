@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Pair Pomodoro</string>
+    <string name="start">START</string>
+    <string name="pause">PAUSE</string>
+    <string name="reset">RESET</string>
+    <string name="start_pomodoro">Start Pomodoro</string>
+    <string name="or">OR</string>
+    <string name="sync_via_sharing_key">Sync via Sharing Key</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.view
+package com.mymeetings.pairpomodoro
 
 import java.util.*
 import java.util.concurrent.TimeUnit

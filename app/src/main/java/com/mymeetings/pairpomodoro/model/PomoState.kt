@@ -1,9 +1,8 @@
 package com.mymeetings.pairpomodoro.model
 
-sealed class PomoState {
-
-    object Default : PomoState()
-    object Focus : PomoState()
-    object ShortBreak : PomoState()
-    object LongBreak : PomoState()
+enum class PomoState {
+    Default,
+    Focus,
+    ShortBreak,
+    LongBreak
 }
