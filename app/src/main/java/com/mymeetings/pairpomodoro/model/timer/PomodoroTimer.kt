@@ -44,7 +44,7 @@ class PomodoroTimer(
         this.balanceTime = pomodoroStatus.balanceTime
         this.pomoState = pomodoroStatus.pomoState
         this.shortBreaksLeft = pomodoroStatus.shortBreaksLeft
-        if (pause) {
+        if (pomodoroStatus.pause) {
             pause()
         } else {
             start()
