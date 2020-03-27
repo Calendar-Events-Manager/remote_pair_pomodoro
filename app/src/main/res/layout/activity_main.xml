@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -70,8 +70,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:textSize="20sp"
             android:text="@string/paused"
+            android:textSize="20sp"
             tools:text="Paused" />
 
         <FrameLayout
@@ -160,7 +160,35 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        tools:visibility="gone">
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/settingsButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_margin="32dp"
+                android:background="@drawable/ic_settings_black_24dp" />
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/createButton"
@@ -190,6 +218,12 @@
             android:layout_marginBottom="16dp"
             android:text="@string/sync_via_sharing_key"
             tools:text="Sync via Share key" />
+
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 

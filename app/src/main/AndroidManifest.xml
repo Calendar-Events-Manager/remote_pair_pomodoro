@@ -19,9 +19,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".PomodorService"
-            android:enabled="true"
-            android:exported="true" />
+        <activity android:name=".view.preference.PreferenceActivity" />
+
+        <service
+            android:name=".PomodorService"
+            android:enabled="true" />
     </application>
 
 </manifest>

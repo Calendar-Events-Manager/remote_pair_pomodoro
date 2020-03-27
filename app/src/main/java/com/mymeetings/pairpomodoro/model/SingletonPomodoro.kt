@@ -5,15 +5,20 @@ import androidx.lifecycle.MutableLiveData
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroCreationMode
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
 import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
+import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
 
 object SingletonPomodoro {
 
     private var pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
     private var pomodoroManager: PomodoroManager? = null
 
-    fun createOwnPomodoro(timerAlarm: TimerAlarm) {
+    fun createOwnPomodoro(
+        timerAlarm: TimerAlarm,
+        timerPreference: TimerPreference
+    ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
+            timerPreference = timerPreference,
             updateCallback = ::update
         ).also {
             it.create()

@@ -2,7 +2,6 @@ package com.mymeetings.pairpomodoro.view
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -11,9 +10,10 @@ import com.mymeetings.pairpomodoro.PomodorService
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroCreationMode
 import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
+import com.mymeetings.pairpomodoro.model.timerPreference.UserTimerPreference
 import com.mymeetings.pairpomodoro.utils.Utils
+import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
 import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -54,7 +54,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         createButton.setOnClickListener {
-            pomodoroViewModel.createOwnPomodoro(AndroidTimerAlarm(this))
+            pomodoroViewModel.createOwnPomodoro(
+                timerAlarm = AndroidTimerAlarm(this),
+                timerPreference = UserTimerPreference(this)
+            )
             showTimerView(null)
         }
 
@@ -77,7 +80,9 @@ class MainActivity : AppCompatActivity() {
             ViewUtils.copyTextToClipBoard(this, sharingKeyText.text.toString())
         }
 
-        //TODO start service too.
+        settingsButton.setOnClickListener {
+            PreferenceActivity.open(this)
+        }
     }
 
     private fun showTimerView(pomodoroStatus: PomodoroStatus?) {
@@ -141,20 +146,4 @@ class MainActivity : AppCompatActivity() {
         val serviceIntent = Intent(this, PomodorService::class.java)
         stopService(serviceIntent)
     }
-}
-
-private fun View.gone() {
-    visibility = View.GONE
-}
-
-private fun View.enable() {
-    isEnabled = true
-}
-
-private fun View.disable() {
-    isEnabled = false
-}
-
-private fun View.visible() {
-    visibility = View.VISIBLE
 }

@@ -3,6 +3,7 @@ package com.mymeetings.pairpomodoro.viewmodel
 import androidx.lifecycle.ViewModel
 import com.mymeetings.pairpomodoro.model.SingletonPomodoro
 import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
+import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
 import java.util.*
 
 class PomodoroViewModel : ViewModel() {
@@ -10,8 +11,14 @@ class PomodoroViewModel : ViewModel() {
     val pomodoroStatusLiveData = SingletonPomodoro.getPomodoroStatusLiveData()
     val sharingKey get() = SingletonPomodoro.shareKey()
 
-    fun createOwnPomodoro(timerAlarm: AndroidTimerAlarm) {
-        SingletonPomodoro.createOwnPomodoro(timerAlarm)
+    fun createOwnPomodoro(
+        timerAlarm: AndroidTimerAlarm,
+        timerPreference: TimerPreference
+    ) {
+        SingletonPomodoro.createOwnPomodoro(
+            timerAlarm = timerAlarm,
+            timerPreference = timerPreference
+        )
     }
 
     fun syncPomodoro(shareKey: String, timerAlarm: AndroidTimerAlarm) {

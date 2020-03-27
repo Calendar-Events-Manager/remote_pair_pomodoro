@@ -2,7 +2,7 @@ package com.mymeetings.pairpomodoro.model.timerPreference
 
 import java.util.concurrent.TimeUnit
 
-data class DefaultTimerPreference(
+data class SyncableTimerPreference(
     private val focusTime: Long = TimeUnit.MINUTES.toMillis(25),
     private val shortBreakTime: Long = TimeUnit.MINUTES.toMillis(3),
     private val longBreakTime: Long = TimeUnit.MINUTES.toMillis(10),
@@ -23,4 +23,14 @@ data class DefaultTimerPreference(
     override fun getLongBreakTime() = longBreakTime
 
     override fun getShortBreakCount() = shortBreakCount
+}
+
+
+fun TimerPreference.toSyncableTimerPreference(): SyncableTimerPreference {
+    return SyncableTimerPreference(
+        focusTime = getFocusTime(),
+        shortBreakTime = getShortBreakTime(),
+        longBreakTime = getLongBreakTime(),
+        shortBreakCount = getShortBreakCount()
+    )
 }

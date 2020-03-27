@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Timings">
+        <SeekBarPreference
+            android:key="focus_time"
+            android:max="30"
+            app:defaultValue="25"
+            app:min="5"
+            app:showSeekBarValue="true"
+            app:title="Focus Time" />
+
+        <SeekBarPreference
+            android:key="short_break_time"
+            android:max="10"
+            app:defaultValue="5"
+            app:min="2"
+            app:showSeekBarValue="true"
+            app:title="Short Break Time" />
+
+        <SeekBarPreference
+            android:key="long_break_time"
+            android:max="30"
+            app:defaultValue="15"
+            app:min="5"
+            app:showSeekBarValue="true"
+            app:title="Long Break Time" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Others">
+        <SeekBarPreference
+            android:key="short_break_count"
+            android:max="4"
+            app:defaultValue="3"
+            app:min="1"
+            app:showSeekBarValue="true"
+            app:title="No of Short breaks" />
+    </PreferenceCategory>
+</PreferenceScreen>

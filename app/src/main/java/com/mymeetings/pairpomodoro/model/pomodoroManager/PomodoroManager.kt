@@ -8,8 +8,9 @@ import com.mymeetings.pairpomodoro.model.timer.PomodoroTimer
 import com.mymeetings.pairpomodoro.model.timer.TickerRunner
 import com.mymeetings.pairpomodoro.model.timer.TimerUpdater
 import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
-import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
+import com.mymeetings.pairpomodoro.model.timerPreference.SyncableTimerPreference
 import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.timerPreference.toSyncableTimerPreference
 import com.mymeetings.pairpomodoro.utils.FirebaseUtils
 import com.mymeetings.pairpomodoro.utils.Utils
 
@@ -18,7 +19,7 @@ class PomodoroManager(
     private val timerAlarm: TimerAlarm,
     private val shareKey: String = Utils.getRandomAlphaNumeric(),
     private val pomodoroCreationMode: PomodoroCreationMode = PomodoroCreationMode.CREATE,
-    private val timerPreference: TimerPreference = DefaultTimerPreference(),
+    private val timerPreference: TimerPreference = SyncableTimerPreference(),
     private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)? = null
 ) : TimerUpdater, ValueEventListener {
 
@@ -35,10 +36,10 @@ class PomodoroManager(
             ).also {
                 it.start()
             }
-            FirebaseUtils.getInfoDBReference(shareKey).setValue(timerPreference)
-            FirebaseUtils.getSyncDBReference(shareKey).addValueEventListener(this)
+            FirebaseUtils.setTimerInfoData(shareKey, timerPreference.toSyncableTimerPreference())
+            FirebaseUtils.listenToStatusSyncData(shareKey, this)
         } else {
-            FirebaseUtils.getInfoDBReference(shareKey).addValueEventListener(this)
+            FirebaseUtils.listenToInfoData(shareKey, this)
         }
     }
 
@@ -57,17 +58,16 @@ class PomodoroManager(
     }
 
     fun close() {
-        FirebaseUtils.getInfoDBReference(shareKey).removeEventListener(this)
-        FirebaseUtils.getSyncDBReference(shareKey).removeEventListener(this)
-        FirebaseUtils.getMasterDbReference(shareKey).removeValue()
+        FirebaseUtils.clearData(shareKey, this)
         pomodoroTimer?.close()
     }
 
     override fun update(pomodoroStatus: PomodoroStatus, actionChanges: Boolean) {
         updateCallback?.invoke(pomodoroStatus)
         if (actionChanges) {
-            FirebaseUtils.getSyncDBReference(shareKey).setValue(
-                PomoStatusWithKey(
+            FirebaseUtils.syncTimerData(
+                sharingKey = shareKey,
+                pomoStatusWithKey = PomoStatusWithKey(
                     sign = mySign,
                     pomodoroStatus = pomodoroStatus,
                     updatedTime = System.currentTimeMillis()
@@ -82,14 +82,17 @@ class PomodoroManager(
 
     override fun onDataChange(datasnapshot: DataSnapshot) {
         if (datasnapshot.key == FirebaseUtils.INFO_REF_KEY) {
-            datasnapshot.getValue(DefaultTimerPreference::class.java)?.let { timerPreference ->
+            datasnapshot.getValue(SyncableTimerPreference::class.java)?.let { timerPreference ->
                 pomodoroTimer = PomodoroTimer(
                     tickerRunner = TickerRunner(),
                     timerPreference = timerPreference,
                     timerAlarm = timerAlarm,
                     timerUpdater = this
                 )
-                FirebaseUtils.getSyncDBReference(shareKey).addValueEventListener(this)
+                FirebaseUtils.listenToStatusSyncData(
+                    sharingKey = shareKey,
+                    valueEventListener = this
+                )
             }
         } else if (datasnapshot.key == FirebaseUtils.SYNC_REF_KEY) {
             datasnapshot.getValue(PomoStatusWithKey::class.java)?.let {
