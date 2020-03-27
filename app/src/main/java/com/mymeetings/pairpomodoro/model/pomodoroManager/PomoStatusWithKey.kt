@@ -11,6 +11,14 @@ data class PomoStatusWithKey(
 
     fun reCorrectedPomoStatus(): PomodoroStatus {
         val diff = System.currentTimeMillis() - updatedTime
-        return pomodoroStatus.copy(balanceTime = pomodoroStatus.balanceTime - diff)
+        val adjustedBalanceTime = pomodoroStatus.balanceTime - diff
+        val reCorrectedBalanceTime = if (adjustedBalanceTime > 0) {
+            adjustedBalanceTime
+        } else {
+            0
+        }
+        return pomodoroStatus.copy(
+            balanceTime = reCorrectedBalanceTime
+        )
     }
 }

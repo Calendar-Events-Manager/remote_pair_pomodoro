@@ -127,6 +127,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
         modeText.text = mode
+
+        val startText = when (pomodoroStatus?.pomoState ?: PomoState.Focus) {
+            PomoState.Focus -> {
+                "Start Focus"
+            }
+            PomoState.LongBreak -> {
+                "Take Long Break"
+            }
+            PomoState.ShortBreak -> {
+                "Take Short Break"
+            }
+        }
+        startButton.text = startText
+
         startService()
     }
 
