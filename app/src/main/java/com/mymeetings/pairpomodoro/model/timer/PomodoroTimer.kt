@@ -20,36 +20,40 @@ class PomodoroTimer(
 
     fun start() {
         pause = false
-        timerAlarm.stopAlarm()
         tickerRunner.run(this)
-        updateTimerInfo()
+        updateTimerInfo(true)
     }
 
     fun pause() {
         pause = true
         tickerRunner.cancel()
-        updateTimerInfo()
+        updateTimerInfo(true)
     }
 
     fun reset() {
         pause = true
-        timerAlarm.stopAlarm()
         tickerRunner.cancel()
         pomoState = PomoState.Focus
         balanceTime = timerPreference.getFocusTime()
         shortBreaksLeft = timerPreference.getShortBreakCount()
-        updateTimerInfo()
+        updateTimerInfo(true)
+    }
+
+    fun close() {
+        tickerRunner.cancel()
     }
 
     fun sync(pomodoroStatus: PomodoroStatus) {
         this.balanceTime = pomodoroStatus.balanceTime
         this.pomoState = pomodoroStatus.pomoState
         this.shortBreaksLeft = pomodoroStatus.shortBreaksLeft
+        this.pause = pomodoroStatus.pause
         if (pomodoroStatus.pause) {
-            pause()
+            tickerRunner.cancel()
         } else {
-            start()
+            tickerRunner.run(this)
         }
+        updateTimerInfo(false)
     }
 
     override fun tick() {
@@ -59,8 +63,9 @@ class PomodoroTimer(
             pomoState = nextPomoState()
             sendAlarmForNextPomoState()
             pause()
+        } else {
+            updateTimerInfo(false)
         }
-        updateTimerInfo()
     }
 
     private fun isTimerOver() = balanceTime <= 0
@@ -102,14 +107,15 @@ class PomodoroTimer(
             }
         }
 
-    private fun updateTimerInfo() =
+    private fun updateTimerInfo(actionChanges: Boolean) =
         timerUpdater.update(
-            PomodoroStatus(
+            pomodoroStatus = PomodoroStatus(
                 pomoState = pomoState,
                 balanceTime = balanceTime,
                 shortBreaksLeft = shortBreaksLeft,
                 pause = pause
-            )
+            ),
+            actionChanges = actionChanges
         )
 
 }

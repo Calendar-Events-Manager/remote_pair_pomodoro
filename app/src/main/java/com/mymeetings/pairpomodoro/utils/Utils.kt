@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro
+package com.mymeetings.pairpomodoro.utils
 
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -19,8 +19,16 @@ object Utils {
 
     fun getRandomAlphaNumeric(): String {
         val allowedChars = "ABCDEFGHIJKLMNOPRSTUV"
-        return (1..5)
-            .map { allowedChars.random() }
-            .joinToString("")
+        return getRandomFrom(allowedChars, 5)
     }
+
+    fun getRandomId(): String {
+        val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        return getRandomFrom(allowedChars, 6)
+    }
+
+    private fun getRandomFrom(allowedChars: String, length: Int) = (1..length)
+        .map { allowedChars.random() }
+        .joinToString("")
+
 }

@@ -14,7 +14,6 @@ object ViewUtils {
 
     fun buildInputDialog(context: Context, textCallback: (String) -> Unit) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setTitle(context.getString(R.string.enter_sharing_key))
 
         val input = EditText(context)
         input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME
@@ -31,6 +30,25 @@ object ViewUtils {
         builder.setNegativeButton(
             context.getString(R.string.cancel)
         ) { dialog, _ -> dialog.cancel() }
+
+        builder.show()
+    }
+
+    fun confirmationDialog(context: Context, message: String, confirmCallback: (status: Boolean) -> Unit) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder.setMessage(message)
+        builder.setPositiveButton(
+            context.getString(R.string.ok)
+        ) { dialog, _ ->
+            confirmCallback(true)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(
+            context.getString(R.string.cancel)
+        ) { dialog, _ ->
+            confirmCallback(false)
+            dialog.cancel()
+        }
 
         builder.show()
     }

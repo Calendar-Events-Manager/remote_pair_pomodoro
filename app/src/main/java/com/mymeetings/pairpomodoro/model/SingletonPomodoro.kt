@@ -2,44 +2,36 @@ package com.mymeetings.pairpomodoro.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroCreationMode
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
-import com.mymeetings.pairpomodoro.model.pomodoroManager.SharePomodoroManager
-import com.mymeetings.pairpomodoro.model.pomodoroManager.SyncPomodoroManager
 import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
-import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
-import java.sql.Time
-import java.util.concurrent.TimeUnit
 
 object SingletonPomodoro {
 
     private var pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
-    var shareKey: String = ""
-    var pomodoroMode = PomodoroMode.CREATED
-
     private var pomodoroManager: PomodoroManager? = null
 
     fun createOwnPomodoro(timerAlarm: TimerAlarm) {
-        pomodoroMode = PomodoroMode.CREATED
-        pomodoroManager = SharePomodoroManager(
-            ::update
+        pomodoroManager = PomodoroManager(
+            timerAlarm = timerAlarm,
+            updateCallback = ::update
         ).also {
-            this.shareKey = it.getShareKey()
-        }.create(DefaultTimerPreference(), timerAlarm)
+            it.create()
+        }
     }
 
     fun syncPomodoro(
         shareKey: String,
         timerAlarm: TimerAlarm
     ) {
-        pomodoroMode = PomodoroMode.SYNCED
-        this.shareKey = shareKey
-        pomodoroManager = SyncPomodoroManager(
-            shareKey,
-            timerAlarm,
-            ::update
+        pomodoroManager = PomodoroManager(
+            timerAlarm = timerAlarm,
+            shareKey = shareKey,
+            pomodoroCreationMode = PomodoroCreationMode.SYNC,
+            updateCallback = ::update
         ).also {
             it.create()
-        }.getPomodoroManager()
+        }
     }
 
     fun start() {
@@ -55,12 +47,12 @@ object SingletonPomodoro {
     }
 
     fun clear() {
-        pomodoroManager?.reset()
-        pomodoroManager = null
+        pomodoroManager?.close()
         pomodoroStatusLiveData.postValue(null)
     }
 
     fun getPomodoroStatusLiveData(): LiveData<PomodoroStatus> = pomodoroStatusLiveData
+    fun shareKey() = pomodoroManager?.getShareKey() ?: ""
 
     private fun update(pomodoroStatus: PomodoroStatus) {
         pomodoroStatusLiveData.postValue(pomodoroStatus)

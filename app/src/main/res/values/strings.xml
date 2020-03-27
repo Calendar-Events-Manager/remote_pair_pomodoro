@@ -11,4 +11,6 @@
     <string name="enter_sharing_key">Enter sharing Key</string>
     <string name="key_copied">Key copied</string>
     <string name="paused">Paused!</string>
+    <string name="exit_app">Exit Timer</string>
+    <string name="reset_timer">Reset Timer</string>
 </resources>

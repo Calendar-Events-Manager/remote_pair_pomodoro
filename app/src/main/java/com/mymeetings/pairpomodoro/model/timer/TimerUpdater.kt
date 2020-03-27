@@ -4,5 +4,5 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 
 interface TimerUpdater {
 
-    fun update(pomodoroStatus: PomodoroStatus)
+    fun update(pomodoroStatus: PomodoroStatus, actionChanges : Boolean)
 }

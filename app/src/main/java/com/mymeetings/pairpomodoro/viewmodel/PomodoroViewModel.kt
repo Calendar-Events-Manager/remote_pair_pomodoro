@@ -8,8 +8,7 @@ import java.util.*
 class PomodoroViewModel : ViewModel() {
 
     val pomodoroStatusLiveData = SingletonPomodoro.getPomodoroStatusLiveData()
-    val sharingKey get() = SingletonPomodoro.shareKey
-    val pomodoroMode get() = SingletonPomodoro.pomodoroMode
+    val sharingKey get() = SingletonPomodoro.shareKey()
 
     fun createOwnPomodoro(timerAlarm: AndroidTimerAlarm) {
         SingletonPomodoro.createOwnPomodoro(timerAlarm)

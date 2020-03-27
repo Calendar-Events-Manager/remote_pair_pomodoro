@@ -1,6 +1,5 @@
 package com.mymeetings.pairpomodoro
 
-import android.R
 import android.app.*
 import android.content.Intent
 import android.os.Build
@@ -17,7 +16,6 @@ class PomodorService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val input = intent!!.getStringExtra("inputExtra")
         createNotificationChannel()
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -25,9 +23,9 @@ class PomodorService : Service() {
             0, notificationIntent, 0
         )
         val notification: Notification = NotificationCompat.Builder(this, "pomodoro")
-            .setContentTitle("Foreground Service")
-            .setContentText(input)
-            .setSmallIcon(R.drawable.ic_lock_idle_alarm)
+            .setContentTitle("Timer Running")
+            .setContentText("Pomodoro is running in foreground")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .build()
         startForeground(1, notification)

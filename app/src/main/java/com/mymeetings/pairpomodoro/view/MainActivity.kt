@@ -9,11 +9,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.mymeetings.pairpomodoro.PomodorService
 import com.mymeetings.pairpomodoro.R
-import com.mymeetings.pairpomodoro.Utils
 import com.mymeetings.pairpomodoro.model.PomoState
-import com.mymeetings.pairpomodoro.model.PomodoroMode
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroCreationMode
 import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
+import com.mymeetings.pairpomodoro.utils.Utils
 import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -46,7 +46,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         resetButton.setOnClickListener {
-            pomodoroViewModel.reset()
+            ViewUtils.confirmationDialog(this, getString(R.string.reset_timer)) {
+                if (it) {
+                    pomodoroViewModel.reset()
+                }
+            }
         }
 
         createButton.setOnClickListener {
@@ -62,7 +66,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         closeButton.setOnClickListener {
-            pomodoroViewModel.close()
+            ViewUtils.confirmationDialog(this, getString(R.string.exit_app)) {
+                if (it) {
+                    pomodoroViewModel.close()
+                }
+            }
         }
 
         sharingKeyText.setOnClickListener {
@@ -98,16 +106,6 @@ class MainActivity : AppCompatActivity() {
                 progressBar.gone()
                 pausedText.gone()
             }
-        }
-
-        if (pomodoroViewModel.pomodoroMode == PomodoroMode.CREATED) {
-            startButton.enable()
-            pauseButton.enable()
-            resetButton.enable()
-        } else {
-            startButton.disable()
-            pauseButton.disable()
-            resetButton.disable()
         }
 
         sharingKeyText.text = pomodoroViewModel.sharingKey
