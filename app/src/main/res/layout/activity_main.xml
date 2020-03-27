@@ -46,7 +46,7 @@
             android:layout_gravity="center"
             android:layout_margin="16dp"
             android:gravity="center"
-            android:textSize="42sp"
+            android:textSize="44sp"
             tools:text="20:05" />
 
         <TextView
@@ -79,32 +79,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:strokeColor="@color/colorPrimary"
+                app:icon="@drawable/ic_play_arrow_white_24dp"
+                app:iconGravity="textStart"
                 android:layout_margin="32dp"
                 android:text="@string/start"
                 tools:text="START"
-                tools:visibility="visible" />
+                tools:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/pauseResetLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="32dp"
-                tools:visibility="gone"
+                tools:visibility="visible"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/pauseButton"
-                    android:layout_width="0dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/pause"
+                    app:icon="@drawable/ic_pause_white_24dp"
+                    app:iconGravity="textStart"
                     tools:text="PAUSE" />
 
-                <Button
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="0dp"/>
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/resetButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    app:icon="@drawable/ic_stop_white_24dp"
+                    app:iconGravity="textStart"
                     android:text="@string/reset"
                     tools:text="RESET" />
 
@@ -115,13 +126,16 @@
         </FrameLayout>
 
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/sharingKeyText"
-            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="32dp"
             android:gravity="center"
+            app:iconGravity="textStart"
+            app:icon="@drawable/ic_share_white_24dp"
             android:textSize="20sp"
             tools:text="ABCDEFG" />
 
@@ -136,8 +150,9 @@
         android:orientation="vertical"
         tools:visibility="gone">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/createButton"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -153,8 +168,9 @@
             android:text="@string/or"
             android:textSize="16sp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/syncButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"

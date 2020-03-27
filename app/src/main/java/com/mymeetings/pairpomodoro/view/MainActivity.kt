@@ -13,6 +13,7 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var pomodoroViewModel: PomodoroViewModel
@@ -58,6 +59,10 @@ class MainActivity : AppCompatActivity() {
 
         closeButton.setOnClickListener {
             pomodoroViewModel.close()
+        }
+
+        sharingKeyText.setOnClickListener {
+            ViewUtils.copyTextToClipBoard(this, sharingKeyText.text.toString())
         }
 
         //TODO start service too.
