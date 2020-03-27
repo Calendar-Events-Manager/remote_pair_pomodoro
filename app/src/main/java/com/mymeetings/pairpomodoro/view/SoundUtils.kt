@@ -8,9 +8,7 @@ import android.net.Uri
 
 object SoundUtils {
 
-    private var ringTone : Ringtone? = null
-
-    fun triggerAlarmSound(context: Context)  {
+    fun triggerAlarmSound(context: Context): Ringtone {
         var alarmUri: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         if (alarmUri == null) {
             alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
@@ -18,10 +16,10 @@ object SoundUtils {
         val ringtone = RingtoneManager.getRingtone(context, alarmUri)
         ringtone.play()
 
-        this.ringTone = ringtone
+        return ringtone
     }
 
-    fun stopAlarm() {
-        this.ringTone?.stop()
+    fun stopAlarm(ringtone: Ringtone) {
+        ringtone.stop()
     }
 }

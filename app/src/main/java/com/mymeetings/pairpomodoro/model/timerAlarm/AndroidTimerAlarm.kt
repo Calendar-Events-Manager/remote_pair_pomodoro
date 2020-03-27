@@ -9,18 +9,21 @@ class AndroidTimerAlarm(private val context: Context) : TimerAlarm {
     private var ringtone: Ringtone? = null
 
     override fun alarmForShortBreak() {
-        SoundUtils.triggerAlarmSound(context)
+        ringtone = SoundUtils.triggerAlarmSound(context)
     }
 
     override fun alarmForLongBreak() {
-        SoundUtils.triggerAlarmSound(context)
+        ringtone = SoundUtils.triggerAlarmSound(context)
     }
 
     override fun alarmForBreakOver() {
-        SoundUtils.triggerAlarmSound(context)
+        ringtone = SoundUtils.triggerAlarmSound(context)
     }
 
     override fun stopAlarm() {
-        SoundUtils.stopAlarm()
+        ringtone?.let {
+            SoundUtils.stopAlarm(it)
+        }
+        ringtone = null
     }
 }
