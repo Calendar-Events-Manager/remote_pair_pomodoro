@@ -19,7 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.preference.PreferenceActivity" />
+        <activity
+            android:name=".view.preference.PreferenceActivity"
+            android:theme="@style/AppTheme.ToolBar" />
 
         <service
             android:name=".PomodorService"
