@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
     android:gravity="center"
     tools:context=".view.MainActivity">
@@ -64,6 +64,16 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <TextView
+            android:id="@+id/pausedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:text="@string/paused"
+            tools:text="Paused" />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -72,18 +82,18 @@
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/startButton"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:strokeColor="@color/colorPrimary"
-                app:icon="@drawable/ic_play_arrow_white_24dp"
-                app:iconGravity="textStart"
                 android:layout_margin="32dp"
                 android:text="@string/start"
+                app:icon="@drawable/ic_play_arrow_white_24dp"
+                app:iconGravity="textStart"
+                app:strokeColor="@color/colorPrimary"
                 tools:text="START"
                 tools:visibility="gone" />
 
@@ -92,12 +102,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="32dp"
-                tools:visibility="visible"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                tools:visibility="visible">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/pauseButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"                    android:layout_width="0dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/pause"
@@ -107,7 +118,7 @@
 
                 <View
                     android:layout_width="32dp"
-                    android:layout_height="0dp"/>
+                    android:layout_height="0dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/resetButton"
@@ -115,9 +126,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:text="@string/reset"
                     app:icon="@drawable/ic_stop_white_24dp"
                     app:iconGravity="textStart"
-                    android:text="@string/reset"
                     tools:text="RESET" />
 
 
@@ -135,9 +146,9 @@
             android:layout_gravity="center"
             android:layout_margin="32dp"
             android:gravity="center"
-            app:iconGravity="textStart"
-            app:icon="@drawable/ic_share_white_24dp"
             android:textSize="20sp"
+            app:icon="@drawable/ic_share_white_24dp"
+            app:iconGravity="textStart"
             tools:text="ABCDEFG" />
 
     </LinearLayout>

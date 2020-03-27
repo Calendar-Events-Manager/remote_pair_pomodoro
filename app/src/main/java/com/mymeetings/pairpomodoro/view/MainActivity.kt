@@ -79,18 +79,25 @@ class MainActivity : AppCompatActivity() {
 
         countDownView.text = Utils.getDurationBreakdown(pomodoroStatus?.balanceTime ?: 0)
 
-        if (pomodoroStatus == null) {
-            startButton.gone()
-            pauseResetLayout.gone()
-            progressBar.visible()
-        } else if (pomodoroStatus.pause) {
-            startButton.visible()
-            pauseResetLayout.gone()
-            progressBar.gone()
-        } else {
-            startButton.gone()
-            pauseResetLayout.visible()
-            progressBar.gone()
+        when {
+            pomodoroStatus == null -> {
+                startButton.gone()
+                pauseResetLayout.gone()
+                progressBar.visible()
+                pausedText.gone()
+            }
+            pomodoroStatus.pause -> {
+                startButton.visible()
+                pauseResetLayout.gone()
+                progressBar.gone()
+                pausedText.visible()
+            }
+            else -> {
+                startButton.gone()
+                pauseResetLayout.visible()
+                progressBar.gone()
+                pausedText.gone()
+            }
         }
 
         if (pomodoroViewModel.pomodoroMode == PomodoroMode.CREATED) {

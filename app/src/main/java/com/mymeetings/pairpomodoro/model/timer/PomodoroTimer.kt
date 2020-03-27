@@ -22,6 +22,7 @@ class PomodoroTimer(
         pause = false
         timerAlarm.stopAlarm()
         tickerRunner.run(this)
+        updateTimerInfo()
     }
 
     fun pause() {

@@ -8,4 +8,7 @@
     <string name="sync_via_sharing_key">Sync via Sharing Key</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="enter_sharing_key">Enter sharing Key</string>
+    <string name="key_copied">Key copied</string>
+    <string name="paused">Paused!</string>
 </resources>

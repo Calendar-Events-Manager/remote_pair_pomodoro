@@ -14,7 +14,7 @@ object ViewUtils {
 
     fun buildInputDialog(context: Context, textCallback: (String) -> Unit) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setTitle("Title")
+        builder.setTitle(context.getString(R.string.enter_sharing_key))
 
         val input = EditText(context)
         input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME
@@ -40,6 +40,6 @@ object ViewUtils {
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("sharing key", textToCopy.toString())
         clipboard.setPrimaryClip(clip)
-        Toast.makeText(context, "Key copied", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.key_copied), Toast.LENGTH_SHORT).show()
     }
 }
