@@ -18,7 +18,7 @@ object Utils {
     }
 
     fun getRandomAlphaNumeric(): String {
-        val allowedChars = "abcdefghiklmnoprstuv"
+        val allowedChars = "ABCDEFGHIJKLMNOPRSTUV"
         return (1..5)
             .map { allowedChars.random() }
             .joinToString("")

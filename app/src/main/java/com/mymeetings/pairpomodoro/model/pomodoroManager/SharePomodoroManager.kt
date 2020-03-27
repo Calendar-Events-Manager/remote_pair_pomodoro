@@ -5,6 +5,7 @@ import com.mymeetings.pairpomodoro.Utils
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -12,14 +13,14 @@ class SharePomodoroManager(
     private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)?
 ) {
 
-    private val shareKey = Utils.getRandomAlphaNumeric()
+    private val shareKey = Utils.getRandomAlphaNumeric().toUpperCase(Locale.getDefault()).trim()
     private var lastUpdatedPomodoroStatus: PomodoroStatus? = null
 
     fun getShareKey() = shareKey
 
     fun create(
         timerPreference: DefaultTimerPreference,
-        timerAlarm : TimerAlarm
+        timerAlarm: TimerAlarm
     ): PomodoroManager {
         FirebaseUtils.getInfoDBReference(shareKey).setValue(timerPreference)
         return PomodoroManager(

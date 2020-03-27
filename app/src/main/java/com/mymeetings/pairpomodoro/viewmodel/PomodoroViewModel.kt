@@ -3,6 +3,7 @@ package com.mymeetings.pairpomodoro.viewmodel
 import androidx.lifecycle.ViewModel
 import com.mymeetings.pairpomodoro.model.SingletonPomodoro
 import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
+import java.util.*
 
 class PomodoroViewModel : ViewModel() {
 
@@ -15,7 +16,7 @@ class PomodoroViewModel : ViewModel() {
     }
 
     fun syncPomodoro(shareKey: String, timerAlarm: AndroidTimerAlarm) {
-        SingletonPomodoro.syncPomodoro(shareKey, timerAlarm)
+        SingletonPomodoro.syncPomodoro(shareKey.toUpperCase(Locale.getDefault()).trim(), timerAlarm)
     }
 
     fun pause() {
