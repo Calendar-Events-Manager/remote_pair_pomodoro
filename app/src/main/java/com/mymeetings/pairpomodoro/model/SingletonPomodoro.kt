@@ -24,12 +24,7 @@ object SingletonPomodoro {
             ::update
         ).also {
             this.shareKey = it.getShareKey()
-        }.create(DefaultTimerPreference(
-            focusTime = TimeUnit.SECONDS.toMillis(10),
-            shortBreakTime = TimeUnit.SECONDS.toMillis(5),
-            longBreakTime = TimeUnit.SECONDS.toMillis(10),
-            shortBreakCount = 3
-        ), timerAlarm)
+        }.create(DefaultTimerPreference(), timerAlarm)
     }
 
     fun syncPomodoro(

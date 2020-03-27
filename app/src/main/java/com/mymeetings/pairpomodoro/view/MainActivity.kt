@@ -1,10 +1,13 @@
 package com.mymeetings.pairpomodoro.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.mymeetings.pairpomodoro.PomodorService
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.Utils
 import com.mymeetings.pairpomodoro.model.PomoState
@@ -114,11 +117,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
         modeText.text = mode
+        startService()
     }
 
     private fun showSelectionView() {
         selectionLayout.visible()
         timerLayout.gone()
+        stopService()
+    }
+
+    fun startService() {
+        val serviceIntent = Intent(this, PomodorService::class.java)
+        serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android")
+        ContextCompat.startForegroundService(this, serviceIntent)
+    }
+
+    fun stopService() {
+        val serviceIntent = Intent(this, PomodorService::class.java)
+        stopService(serviceIntent)
     }
 }
 
