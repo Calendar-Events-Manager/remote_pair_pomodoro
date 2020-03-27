@@ -13,13 +13,14 @@ class PomodoroTimer(
     private val timerUpdater: TimerUpdater
 ) : Ticker {
 
-    private var pomoState: PomoState = PomoState.Default
+    private var pomoState: PomoState = PomoState.Focus
     private var balanceTime: Long = timerPreference.getFocusTime()
     private var shortBreaksLeft: Int = timerPreference.getShortBreakCount()
     private var pause: Boolean = true
 
     fun start() {
         pause = false
+        timerAlarm.stopAlarm()
         tickerRunner.run(this)
     }
 
@@ -31,8 +32,9 @@ class PomodoroTimer(
 
     fun reset() {
         pause = true
+        timerAlarm.stopAlarm()
         tickerRunner.cancel()
-        pomoState = PomoState.Default
+        pomoState = PomoState.Focus
         balanceTime = timerPreference.getFocusTime()
         shortBreaksLeft = timerPreference.getShortBreakCount()
         updateTimerInfo()
@@ -54,8 +56,8 @@ class PomodoroTimer(
 
         if (isTimerOver()) {
             pomoState = nextPomoState()
-            pause()
             sendAlarmForNextPomoState()
+            pause()
         }
         updateTimerInfo()
     }
@@ -78,19 +80,25 @@ class PomodoroTimer(
 
     private fun nextPomoState() =
         when (pomoState) {
-            PomoState.Default -> PomoState.Focus
             PomoState.Focus -> {
                 if (shortBreaksLeft > 0) {
                     shortBreaksLeft -= 1
                     balanceTime = timerPreference.getShortBreakTime()
                     PomoState.ShortBreak
                 } else {
+                    balanceTime = timerPreference.getLongBreakTime()
                     shortBreaksLeft = timerPreference.getShortBreakCount()
                     PomoState.LongBreak
                 }
             }
-            PomoState.ShortBreak -> PomoState.Focus
-            PomoState.LongBreak -> PomoState.Focus
+            PomoState.ShortBreak -> {
+                balanceTime = timerPreference.getFocusTime()
+                PomoState.Focus
+            }
+            PomoState.LongBreak -> {
+                balanceTime = timerPreference.getFocusTime()
+                PomoState.Focus
+            }
         }
 
     private fun updateTimerInfo() =

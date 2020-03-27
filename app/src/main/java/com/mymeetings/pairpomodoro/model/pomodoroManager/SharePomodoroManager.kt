@@ -3,6 +3,7 @@ package com.mymeetings.pairpomodoro.model.pomodoroManager
 import com.mymeetings.pairpomodoro.FirebaseUtils
 import com.mymeetings.pairpomodoro.Utils
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -16,12 +17,15 @@ class SharePomodoroManager(
 
     fun getShareKey() = shareKey
 
-    fun create(timerPreference: DefaultTimerPreference): PomodoroManager {
+    fun create(
+        timerPreference: DefaultTimerPreference,
+        timerAlarm : TimerAlarm
+    ): PomodoroManager {
         FirebaseUtils.getInfoDBReference(shareKey).setValue(timerPreference)
         return PomodoroManager(
             ::update
         ).also {
-            it.create(timerPreference)
+            it.create(timerPreference, timerAlarm)
         }
     }
 

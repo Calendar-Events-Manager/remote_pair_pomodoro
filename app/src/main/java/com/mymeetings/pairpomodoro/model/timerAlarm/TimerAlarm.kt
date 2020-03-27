@@ -7,4 +7,6 @@ interface TimerAlarm {
     fun alarmForLongBreak()
 
     fun alarmForBreakOver()
+
+    fun stopAlarm()
 }

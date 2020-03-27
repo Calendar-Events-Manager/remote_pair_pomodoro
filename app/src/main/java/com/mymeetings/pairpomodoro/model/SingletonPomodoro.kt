@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
 import com.mymeetings.pairpomodoro.model.pomodoroManager.SharePomodoroManager
 import com.mymeetings.pairpomodoro.model.pomodoroManager.SyncPomodoroManager
+import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
+import java.sql.Time
+import java.util.concurrent.TimeUnit
 
 object SingletonPomodoro {
 
@@ -15,20 +18,29 @@ object SingletonPomodoro {
 
     private var pomodoroManager: PomodoroManager? = null
 
-    fun createOwnPomodoro() {
+    fun createOwnPomodoro(timerAlarm: TimerAlarm) {
         pomodoroMode = PomodoroMode.CREATED
         pomodoroManager = SharePomodoroManager(
             ::update
         ).also {
             this.shareKey = it.getShareKey()
-        }.create(DefaultTimerPreference())
+        }.create(DefaultTimerPreference(
+            focusTime = TimeUnit.SECONDS.toMillis(10),
+            shortBreakTime = TimeUnit.SECONDS.toMillis(5),
+            longBreakTime = TimeUnit.SECONDS.toMillis(10),
+            shortBreakCount = 3
+        ), timerAlarm)
     }
 
-    fun syncPomodoro(shareKey: String) {
+    fun syncPomodoro(
+        shareKey: String,
+        timerAlarm: TimerAlarm
+    ) {
         pomodoroMode = PomodoroMode.SYNCED
         this.shareKey = shareKey
         pomodoroManager = SyncPomodoroManager(
             shareKey,
+            timerAlarm,
             ::update
         ).also {
             it.create()

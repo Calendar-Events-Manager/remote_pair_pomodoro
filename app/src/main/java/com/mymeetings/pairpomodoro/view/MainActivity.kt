@@ -10,6 +10,7 @@ import com.mymeetings.pairpomodoro.Utils
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroMode
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
 import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -46,13 +47,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         createButton.setOnClickListener {
-            pomodoroViewModel.createOwnPomodoro()
+            pomodoroViewModel.createOwnPomodoro(AndroidTimerAlarm(this))
             showTimerView(null)
         }
 
         syncButton.setOnClickListener {
             ViewUtils.buildInputDialog(this) {
-                pomodoroViewModel.syncPomodoro(it)
+                pomodoroViewModel.syncPomodoro(it, AndroidTimerAlarm(this))
                 showTimerView(null)
             }
         }
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
         sharingKeyText.text = pomodoroViewModel.sharingKey
 
-        val mode = when (pomodoroStatus?.pomoState ?: PomoState.Default) {
+        val mode = when (pomodoroStatus?.pomoState ?: PomoState.Focus) {
             PomoState.Focus -> {
                 "Focus"
             }
@@ -110,9 +111,6 @@ class MainActivity : AppCompatActivity() {
             }
             PomoState.ShortBreak -> {
                 "Short Break"
-            }
-            PomoState.Default -> {
-                "Focus"
             }
         }
         modeText.text = mode

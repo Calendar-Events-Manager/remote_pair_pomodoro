@@ -2,6 +2,7 @@ package com.mymeetings.pairpomodoro.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.mymeetings.pairpomodoro.model.SingletonPomodoro
+import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
 
 class PomodoroViewModel : ViewModel() {
 
@@ -9,12 +10,12 @@ class PomodoroViewModel : ViewModel() {
     val sharingKey get() = SingletonPomodoro.shareKey
     val pomodoroMode get() = SingletonPomodoro.pomodoroMode
 
-    fun createOwnPomodoro() {
-        SingletonPomodoro.createOwnPomodoro()
+    fun createOwnPomodoro(timerAlarm: AndroidTimerAlarm) {
+        SingletonPomodoro.createOwnPomodoro(timerAlarm)
     }
 
-    fun syncPomodoro(shareKey: String) {
-        SingletonPomodoro.syncPomodoro(shareKey)
+    fun syncPomodoro(shareKey: String, timerAlarm: AndroidTimerAlarm) {
+        SingletonPomodoro.syncPomodoro(shareKey, timerAlarm)
     }
 
     fun pause() {

@@ -6,5 +6,5 @@ data class PomodoroStatus(
     val shortBreaksLeft: Int,
     val pause: Boolean
 ) {
-    constructor() : this(PomoState.Default, 0L, 0, false)
+    constructor() : this(PomoState.Focus, 0L, 0, true)
 }

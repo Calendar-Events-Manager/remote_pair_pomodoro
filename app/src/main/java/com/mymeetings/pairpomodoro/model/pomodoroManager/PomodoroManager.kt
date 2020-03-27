@@ -4,21 +4,24 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.timer.PomodoroTimer
 import com.mymeetings.pairpomodoro.model.timer.TickerRunner
 import com.mymeetings.pairpomodoro.model.timer.TimerUpdater
-import com.mymeetings.pairpomodoro.model.timerAlarm.AndroidTimerAlarm
+import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
 
 
 class PomodoroManager(
-    private val updateCallback : ((pomodoroStatus : PomodoroStatus) -> Unit)?
+    private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)?
 ) : TimerUpdater {
 
     private lateinit var pomodoroTimer: PomodoroTimer
 
-    internal fun create(timerPreference: DefaultTimerPreference) {
+    internal fun create(
+        timerPreference: DefaultTimerPreference,
+        timerAlarm: TimerAlarm
+    ) {
         pomodoroTimer = PomodoroTimer(
             tickerRunner = TickerRunner(),
             timerPreference = timerPreference,
-            timerAlarm = AndroidTimerAlarm(),
+            timerAlarm = timerAlarm,
             timerUpdater = this
         )
         pomodoroTimer.start()

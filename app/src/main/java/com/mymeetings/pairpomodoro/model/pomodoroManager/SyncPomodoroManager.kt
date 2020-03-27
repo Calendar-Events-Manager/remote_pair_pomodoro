@@ -5,10 +5,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.mymeetings.pairpomodoro.FirebaseUtils
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.timerPreference.DefaultTimerPreference
 
 class SyncPomodoroManager(
     private val shareKey: String,
+    private val timerAlarm: TimerAlarm,
     private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)?
 ) : ValueEventListener {
 
@@ -30,7 +32,7 @@ class SyncPomodoroManager(
     override fun onDataChange(p0: DataSnapshot) {
         if (p0.key == FirebaseUtils.INFO_REF_KEY) {
             p0.getValue(DefaultTimerPreference::class.java)?.let {
-                pomodoroManager.create(it)
+                pomodoroManager.create(it, timerAlarm)
                 FirebaseUtils.getSyncDBReference(shareKey).addValueEventListener(this)
             }
         } else if (p0.key == FirebaseUtils.SYNC_REF_KEY) {
