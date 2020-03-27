@@ -10,7 +10,7 @@ data class DefaultTimerPreference(
 ) : TimerPreference {
 
     constructor() : this(
-        focusTime = TimeUnit.SECONDS.toMillis(25),
+        focusTime = TimeUnit.MINUTES.toMillis(25),
         shortBreakTime = TimeUnit.MINUTES.toMillis(3),
         longBreakTime = TimeUnit.MINUTES.toMillis(10),
         shortBreakCount = 3
