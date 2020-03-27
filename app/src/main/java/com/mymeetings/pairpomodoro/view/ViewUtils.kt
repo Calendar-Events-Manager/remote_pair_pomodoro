@@ -3,37 +3,37 @@ package com.mymeetings.pairpomodoro.view
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.text.InputType
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.mymeetings.pairpomodoro.R
+import kotlinx.android.synthetic.main.dialog_sharing_key.view.*
 
 
 object ViewUtils {
 
     fun buildInputDialog(context: Context, textCallback: (String) -> Unit) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setTitle(context.getString(R.string.enter_sharing_key))
 
-        val input = EditText(context)
-        input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME
-        builder.setView(input)
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_sharing_key, null)
+        builder.setView(view)
 
-        builder.setPositiveButton(
-            context.getString(R.string.ok)
-        ) { dialog, _ ->
-            if (input.text.isNotBlank()) {
-                textCallback(input.text.toString())
+        val dialog = builder.show()
+
+        view.sharingKeyText.requestFocus()
+        view.syncButton.setOnClickListener {
+            val sharingKey = view.sharingKeyText.text.toString()
+            if (sharingKey.length == 5) {
+                textCallback(sharingKey)
                 dialog.dismiss()
             }
         }
-        builder.setNegativeButton(
-            context.getString(R.string.cancel)
-        ) { dialog, _ -> dialog.cancel() }
 
-        builder.show()
+        view.cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
     }
 
     fun confirmationDialog(
