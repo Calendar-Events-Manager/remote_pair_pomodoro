@@ -27,10 +27,10 @@
         android:focusableInTouchMode="true"
         android:gravity="center"
         android:inputType="textCapCharacters"
-        android:itemBackground="@android:color/white"
-        android:textColor="@color/colorPrimary"
+        android:itemBackground="@color/colorBackground"
+        android:textStyle="bold"
         app:itemCount="5"
-        app:lineColor="@color/colorAccent"
+        app:lineColor="@color/colorPrimary"
         app:viewType="rectangle"
         tools:text="HELLO" />
 
