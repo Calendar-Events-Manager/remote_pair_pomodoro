@@ -7,12 +7,15 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
+import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroMaintainer
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.view.MainActivity
 
 
 class PomodorService : Service(), Observer<PomodoroStatus> {
+
+    private var pomoState: PomoState? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -39,9 +42,15 @@ class PomodorService : Service(), Observer<PomodoroStatus> {
     }
 
     override fun onChanged(pomodoroStatus: PomodoroStatus?) {
-        if (pomodoroStatus != null) {
-            //TODO check for major change.
-            //TODO show proper notification
+        if (pomodoroStatus != null && pomodoroStatus.pomoState != pomoState) {
+            pomoState = pomodoroStatus.pomoState
+
+            val notification = getMyActivityNotification(pomodoroStatus.pomoState.name)
+
+            val mNotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            mNotificationManager.notify(NOTIF_ID, notification)
+
         }
     }
 
@@ -64,6 +73,8 @@ class PomodorService : Service(), Observer<PomodoroStatus> {
         return NotificationCompat.Builder(this, "pomodoro")
             .setContentTitle(titleText)
             .setContentText("Pomodoro is running in foreground")
+            .setWhen(System.currentTimeMillis())
+            .setUsesChronometer(true)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .build()
