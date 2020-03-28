@@ -34,6 +34,7 @@ class TickerRunnerTest {
         tickerRunner.run(ticker)
         delay(1000)
         tickerRunner.cancel()
+        delay(1000)
 
         verify(exactly = 1) { ticker.tick() }
     }
