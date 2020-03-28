@@ -176,10 +176,10 @@
 
             <ImageButton
                 android:id="@+id/settingsButton"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="center"
-                android:layout_margin="32dp"
+                android:layout_margin="28dp"
                 android:background="@drawable/ic_settings_black_24dp" />
 
 
