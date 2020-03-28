@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.model.timer
+package com.mymeetings.pairpomodoro.model.pomodoroTimer
 
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK

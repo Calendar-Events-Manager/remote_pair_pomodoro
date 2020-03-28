@@ -1,14 +1,14 @@
 package com.mymeetings.pairpomodoro.model.pomodoroManager
 
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.timer.PomodoroTimer
-import com.mymeetings.pairpomodoro.model.timer.TickerRunner
-import com.mymeetings.pairpomodoro.model.timer.TimerUpdater
-import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
-import com.mymeetings.pairpomodoro.model.timerPreference.SyncableTimerPreference
-import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
-import com.mymeetings.pairpomodoro.model.timerSyncer.FirebaseTimerSyncer
-import com.mymeetings.pairpomodoro.model.timerSyncer.TimerSyncer
+import com.mymeetings.pairpomodoro.model.pomodoroTimer.PomodoroTimer
+import com.mymeetings.pairpomodoro.model.pomodoroTimer.TickerRunner
+import com.mymeetings.pairpomodoro.model.pomodoroTimer.TimerUpdater
+import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.SyncableTimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroSyncer.FirebaseTimerSyncer
+import com.mymeetings.pairpomodoro.model.pomodoroSyncer.TimerSyncer
 import com.mymeetings.pairpomodoro.utils.Utils
 
 

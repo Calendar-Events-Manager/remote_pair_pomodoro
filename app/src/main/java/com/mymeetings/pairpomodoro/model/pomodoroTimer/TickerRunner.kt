@@ -1,6 +1,5 @@
-package com.mymeetings.pairpomodoro.model.timer
+package com.mymeetings.pairpomodoro.model.pomodoroTimer
 
-import com.mymeetings.pairpomodoro.model.timer.Ticker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker

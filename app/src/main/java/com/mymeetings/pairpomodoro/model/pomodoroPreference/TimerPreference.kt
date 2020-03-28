@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.model.timerPreference
+package com.mymeetings.pairpomodoro.model.pomodoroPreference
 
 interface TimerPreference {
 

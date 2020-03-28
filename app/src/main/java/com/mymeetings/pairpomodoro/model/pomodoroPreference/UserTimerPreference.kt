@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.model.timerPreference
+package com.mymeetings.pairpomodoro.model.pomodoroPreference
 
 import android.content.Context
 import android.content.SharedPreferences

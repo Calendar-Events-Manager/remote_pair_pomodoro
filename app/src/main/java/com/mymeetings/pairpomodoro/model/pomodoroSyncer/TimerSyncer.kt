@@ -1,7 +1,7 @@
-package com.mymeetings.pairpomodoro.model.timerSyncer
+package com.mymeetings.pairpomodoro.model.pomodoroSyncer
 
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 
 interface TimerSyncer {
 

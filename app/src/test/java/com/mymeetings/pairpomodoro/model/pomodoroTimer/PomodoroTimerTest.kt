@@ -1,10 +1,10 @@
-package com.mymeetings.pairpomodoro.model.timer
+package com.mymeetings.pairpomodoro.model.pomodoroTimer
 
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
-import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarmType
-import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
+import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarmType
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Before

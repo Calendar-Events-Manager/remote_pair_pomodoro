@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.model.timerAlarm
+package com.mymeetings.pairpomodoro.model.pomodoroAlarm
 
 import com.mymeetings.pairpomodoro.model.PomoState
 

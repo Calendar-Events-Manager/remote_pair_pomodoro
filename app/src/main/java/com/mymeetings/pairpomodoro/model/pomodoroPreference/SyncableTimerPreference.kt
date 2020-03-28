@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro.model.timerPreference
+package com.mymeetings.pairpomodoro.model.pomodoroPreference
 
 import java.util.concurrent.TimeUnit
 
