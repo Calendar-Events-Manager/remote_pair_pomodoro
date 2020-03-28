@@ -20,14 +20,14 @@ class TickerRunner {
         consumer(timeTicker, tickerChannel)
     }
 
-    private fun cancelPrevious() {
-        cancel()
-    }
-
     fun cancel() {
         if(job?.isActive == true) {
             job?.cancel()
         }
+    }
+
+    private fun cancelPrevious() {
+        cancel()
     }
 
     private fun consumer(tickerTimer: Ticker, tickerChannel: ReceiveChannel<Unit>) {

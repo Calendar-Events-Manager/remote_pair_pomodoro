@@ -38,6 +38,7 @@ class PomodoroManager(
             }
             FirebaseUtils.setTimerInfoData(shareKey, timerPreference.toSyncableTimerPreference())
             FirebaseUtils.listenToStatusSyncData(shareKey, this)
+            FirebaseUtils.clearDataOnDisconnect(shareKey)
         } else {
             FirebaseUtils.listenToInfoData(shareKey, this)
         }

@@ -38,7 +38,7 @@ object FirebaseUtils {
     fun clearData(sharingKey: String, valueEventListener: ValueEventListener) {
         getInfoDBReference(sharingKey).removeEventListener(valueEventListener)
         getSyncDBReference(sharingKey).removeEventListener(valueEventListener)
-        getMasterDbReference(sharingKey).setValue(null)
+        getMasterDbReference(sharingKey).removeValue()
     }
 
     fun setTimerInfoData(sharingKey: String, timerPreference: SyncableTimerPreference) {
@@ -47,5 +47,9 @@ object FirebaseUtils {
 
     fun syncTimerData(sharingKey: String, pomoStatusWithKey: PomoStatusWithKey) {
         getSyncDBReference(sharingKey).setValue(pomoStatusWithKey)
+    }
+
+    fun clearDataOnDisconnect(shareKey: String) {
+        getMasterDbReference(shareKey).onDisconnect().removeValue()
     }
 }
