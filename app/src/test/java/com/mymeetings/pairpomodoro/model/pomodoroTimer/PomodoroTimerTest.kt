@@ -5,8 +5,11 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarmType
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.utils.ClockUtil
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
@@ -23,30 +26,41 @@ class PomodoroTimerTest {
     private lateinit var timerAlarm: TimerAlarm
     @MockK
     private lateinit var timerUpdater: TimerUpdater
+    @MockK
+    private lateinit var clockUtil: ClockUtil
+
+    private val focusTime = 3000L
+    private val shortBreakTime = 1000L
+    private val longBreakTime = 1000L
+    private val shortBreakCount = 2
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        every { timerPreference.getFocusTime() } returns TimeUnit.SECONDS.toMillis(3)
-        every { timerPreference.getShortBreakTime() } returns TimeUnit.SECONDS.toMillis(1)
-        every { timerPreference.getLongBreakTime() } returns TimeUnit.SECONDS.toMillis(2)
-        every { timerPreference.getShortBreakCount() } returns 2
+        every { clockUtil.getDiff() } returns 0
+        every { timerPreference.getFocusTime() } returns focusTime
+        every { timerPreference.getShortBreakTime() } returns shortBreakTime
+        every { timerPreference.getLongBreakTime() } returns longBreakTime
+        every { timerPreference.getShortBreakCount() } returns shortBreakCount
 
         pomodoroTimer = PomodoroTimer(
             tickerRunner = tickerRunner,
             timerPreference = timerPreference,
             timerAlarm = timerAlarm,
-            timerUpdater = timerUpdater
+            timerUpdater = timerUpdater,
+            clockUtil = clockUtil
         )
     }
 
     @Test
     fun `start should update info first and followed by each tick in timerUpdater`() {
 
-        every { tickerRunner.run(pomodoroTimer) } answers { pomodoroTimer.tick() }
+        val timePassed = 1000L
 
         pomodoroTimer.start()
+        every { clockUtil.getDiff() } returns timePassed
+        pomodoroTimer.tick()
 
         val expectedFirstPomoStatus = PomodoroStatus(
             pomoState = PomoState.Focus,
@@ -56,13 +70,12 @@ class PomodoroTimerTest {
         )
         val expectedSecondPomoState =
             expectedFirstPomoStatus.copy(
-                balanceTime = timerPreference.getFocusTime() - TimeUnit.SECONDS.toMillis(
-                    1
-                )
+                balanceTime = timerPreference.getFocusTime() - timePassed
             )
 
         verifyOrder {
             timerUpdater.update(expectedFirstPomoStatus, true)
+            tickerRunner.run(pomodoroTimer)
             timerUpdater.update(expectedSecondPomoState, false)
         }
         verify(exactly = 0) { timerAlarm.alarm(any()) }
@@ -71,14 +84,9 @@ class PomodoroTimerTest {
     @Test
     fun `start with tick should change pomostate to shortBreak when time is over and update info in timerUpdater`() {
 
-        every { tickerRunner.run(pomodoroTimer) } answers {
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus. -> ShortBreak
-        }
-        every { timerPreference.getFocusTime() } returns TimeUnit.SECONDS.toMillis(1)
-
         pomodoroTimer.start()
+        every { clockUtil.getDiff() } returns focusTime
+        pomodoroTimer.tick()
 
         val expectedPomoStatus = PomodoroStatus(
             pomoState = PomoState.ShortBreak,
@@ -93,22 +101,19 @@ class PomodoroTimerTest {
     @Test
     fun `start with tick should change pomostate to LongBreak when time is over and update info in timerUpdater`() {
 
-        every { tickerRunner.run((pomodoroTimer)) } answers {
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus -> ShortBreak
-            pomodoroTimer.tick() //ShortBreak -> Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus -> ShortBreak
-            pomodoroTimer.tick() //ShortBreak -> Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-        }
-        every { timerPreference.getFocusTime() } returns TimeUnit.SECONDS.toMillis(1)
-
         pomodoroTimer.start()
+        every { clockUtil.getDiff() } returns focusTime
+        pomodoroTimer.tick()
+        every { clockUtil.getDiff() } returns shortBreakTime
+        pomodoroTimer.tick()
+
+        every { clockUtil.getDiff() } returns focusTime
+        pomodoroTimer.tick()
+        every { clockUtil.getDiff() } returns shortBreakTime
+        pomodoroTimer.tick()
+
+        every { clockUtil.getDiff() } returns focusTime
+        pomodoroTimer.tick()
 
         val expectedPomoStatus = PomodoroStatus(
             pomoState = PomoState.LongBreak,
@@ -122,57 +127,66 @@ class PomodoroTimerTest {
 
     @Test
     fun `pause should cancel the ticker runner and update info with pause and current state`() {
-        every { tickerRunner.run(pomodoroTimer) } answers {
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus. -> ShortBreak
-        }
-        every { timerPreference.getFocusTime() } returns TimeUnit.SECONDS.toMillis(1)
+        val timeToPass = 1000L
 
         pomodoroTimer.start()
+        every { clockUtil.getDiff() } returns timeToPass
+        pomodoroTimer.tick()
         pomodoroTimer.pause()
 
-        val expectedPomoStatus = PomodoroStatus(
-            pomoState = PomoState.ShortBreak,
-            balanceTime = timerPreference.getShortBreakTime(),
-            shortBreaksLeft = timerPreference.getShortBreakCount() - 1,
+        val expectedPomoStatusForStart = PomodoroStatus(
+            pomoState = PomoState.Focus,
+            balanceTime = timerPreference.getFocusTime(),
+            shortBreaksLeft = timerPreference.getShortBreakCount(),
+            pause = false
+        )
+        val expectedPomoStatusForPause = PomodoroStatus(
+            pomoState = PomoState.Focus,
+            balanceTime = timerPreference.getFocusTime() - timeToPass,
+            shortBreaksLeft = timerPreference.getShortBreakCount(),
             pause = true
         )
         verifyOrder {
+            timerUpdater.update(expectedPomoStatusForStart, true)
+            tickerRunner.run(pomodoroTimer)
             tickerRunner.cancel()
-            timerUpdater.update(expectedPomoStatus, true)
+            timerUpdater.update(expectedPomoStatusForPause, true)
         }
-
     }
 
     @Test
     fun `reset should cancel the ticker runner and update info with pause and reset state`() {
-        every { tickerRunner.run(pomodoroTimer) } answers {
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus
-            pomodoroTimer.tick() //Focus. -> ShortBreak
-        }
-        every { timerPreference.getFocusTime() } returns TimeUnit.SECONDS.toMillis(1)
+        val timeToPass = 1000L
 
         pomodoroTimer.start()
+        every { clockUtil.getDiff() } returns timeToPass
+        pomodoroTimer.tick()
         pomodoroTimer.reset()
 
-        val expectedPomoStatus = PomodoroStatus(
+        val expectedPomoStatusForStart = PomodoroStatus(
+            pomoState = PomoState.Focus,
+            balanceTime = timerPreference.getFocusTime(),
+            shortBreaksLeft = timerPreference.getShortBreakCount(),
+            pause = false
+        )
+        val expectedPomoStatusForPause = PomodoroStatus(
             pomoState = PomoState.Focus,
             balanceTime = timerPreference.getFocusTime(),
             shortBreaksLeft = timerPreference.getShortBreakCount(),
             pause = true
         )
         verifyOrder {
+            timerUpdater.update(expectedPomoStatusForStart, true)
+            tickerRunner.run(pomodoroTimer)
             tickerRunner.cancel()
-            timerUpdater.update(expectedPomoStatus, true)
+            timerUpdater.update(expectedPomoStatusForPause, true)
         }
     }
 
     @Test
     fun `sync should sync the state and start if state is not paused`() {
+        val timeToPass = 1000L
 
-        every { tickerRunner.run(pomodoroTimer) } answers { pomodoroTimer.tick() }
         val pomoStatus = PomodoroStatus(
             pomoState = PomoState.ShortBreak,
             balanceTime = 10000,
@@ -181,14 +195,14 @@ class PomodoroTimerTest {
         )
 
         pomodoroTimer.sync(pomoStatus)
+        every { clockUtil.getDiff() } returns timeToPass
+        pomodoroTimer.tick()
 
         verifyOrder {
             tickerRunner.run(pomodoroTimer)
             timerUpdater.update(
                 pomoStatus.copy(
-                    balanceTime = pomoStatus.balanceTime - TimeUnit.SECONDS.toMillis(
-                        1
-                    )
+                    balanceTime = pomoStatus.balanceTime - timeToPass
                 ), false
             )
         }

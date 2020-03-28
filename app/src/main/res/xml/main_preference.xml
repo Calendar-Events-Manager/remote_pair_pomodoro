@@ -42,5 +42,11 @@
             app:showSeekBarValue="true"
             app:summary="Number of Short breaks to occur before a long break"
             app:title="No of Short breaks" />
+
+        <SwitchPreference
+            android:key="screen_on"
+            app:defaultValue="true"
+            app:summary="Keep the screen awake while timer is running"
+            app:title="Keep Screen Awake" />
     </PreferenceCategory>
 </PreferenceScreen>

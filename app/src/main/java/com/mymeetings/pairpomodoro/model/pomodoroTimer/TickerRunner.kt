@@ -20,7 +20,7 @@ class TickerRunner {
     }
 
     fun cancel() {
-        if(job?.isActive == true) {
+        if (job?.isActive == true) {
             job?.cancel()
         }
     }

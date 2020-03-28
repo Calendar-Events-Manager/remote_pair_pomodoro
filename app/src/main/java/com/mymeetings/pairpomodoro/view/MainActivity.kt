@@ -2,10 +2,12 @@ package com.mymeetings.pairpomodoro.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PowerManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.mymeetings.pairpomodoro.PomodorService
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomoState
@@ -21,6 +23,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var pomodoroViewModel: PomodoroViewModel
+
+    private var wakeLock: PowerManager.WakeLock? = null
+
+    private var isServiceRunning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         settingsButton.setOnClickListener {
             PreferenceActivity.open(this)
         }
+
     }
 
     private fun showTimerView(pomodoroStatus: PomodoroStatus?) {
@@ -141,13 +148,31 @@ class MainActivity : AppCompatActivity() {
         }
         startButton.text = startText
 
-        startService()
+
+        container.keepScreenOn =
+            PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)
+
+        if (pomodoroStatus?.pause == false) {
+            wakeLock = WakeLockUtil.makeCPUPowerInWake(this, pomodoroStatus.balanceTime)
+        } else {
+            wakeLock?.release()
+        }
+
+        if (!isServiceRunning) {
+            isServiceRunning = true
+            startService()
+        }
     }
 
     private fun showSelectionView() {
         selectionLayout.visible()
         timerLayout.gone()
-        stopService()
+        container.keepScreenOn = false
+
+        if (isServiceRunning) {
+            stopService()
+            isServiceRunning = false
+        }
     }
 
     fun startService() {

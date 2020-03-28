@@ -5,13 +5,15 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.toTimerAlarmType
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.utils.ClockUtil
 import java.util.concurrent.TimeUnit
 
 class PomodoroTimer(
     private val tickerRunner: TickerRunner,
     private val timerPreference: TimerPreference,
     private val timerAlarm: TimerAlarm,
-    private val timerUpdater: TimerUpdater
+    private val timerUpdater: TimerUpdater,
+    private val clockUtil: ClockUtil = ClockUtil()
 ) : Ticker {
 
     private var pomoState: PomoState = PomoState.Focus
@@ -58,7 +60,7 @@ class PomodoroTimer(
     }
 
     override fun tick() {
-        balanceTime -= TimeUnit.SECONDS.toMillis(1)
+        balanceTime -= clockUtil.getDiff()
 
         if (isTimerOver()) {
             pomoState = nextPomoState()
