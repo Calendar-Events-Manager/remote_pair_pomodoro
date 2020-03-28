@@ -3,6 +3,7 @@ package com.mymeetings.pairpomodoro.model.timer
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.timerAlarm.TimerAlarm
+import com.mymeetings.pairpomodoro.model.timerAlarm.toTimerAlarmType
 import com.mymeetings.pairpomodoro.model.timerPreference.TimerPreference
 import java.util.concurrent.TimeUnit
 
@@ -20,8 +21,8 @@ class PomodoroTimer(
 
     fun start() {
         pause = false
-        tickerRunner.run(this)
         updateTimerInfo(true)
+        tickerRunner.run(this)
     }
 
     fun pause() {
@@ -71,17 +72,7 @@ class PomodoroTimer(
     private fun isTimerOver() = balanceTime <= 0
 
     private fun sendAlarmForNextPomoState() {
-        when (pomoState) {
-            PomoState.ShortBreak -> {
-                timerAlarm.alarmForShortBreak()
-            }
-            PomoState.LongBreak -> {
-                timerAlarm.alarmForLongBreak()
-            }
-            PomoState.Focus -> {
-                timerAlarm.alarmForBreakOver()
-            }
-        }
+        timerAlarm.alarm(pomoState.toTimerAlarmType())
     }
 
     private fun nextPomoState() =
