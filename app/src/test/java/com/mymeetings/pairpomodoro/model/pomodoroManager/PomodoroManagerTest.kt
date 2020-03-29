@@ -171,14 +171,4 @@ class PomodoroManagerTest {
 
         assert(actualSharingKey == sharingKey)
     }
-
-    @Test
-    fun `initializing PomodoroManager should auto assign FirebaseSyncer`() {
-        val pomodoroManager = PomodoroManager(
-            timerAlarm = timerAlarm,
-            updateCallback = updateCallback
-        )
-
-        assert(pomodoroManager != null)
-    }
 }

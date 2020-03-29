@@ -80,7 +80,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
         } else if (datasnapshot.key == SYNC_REF_KEY) {
             datasnapshot.getValue(PomoStatusWithKey::class.java)?.let { pomoStatusWithKey ->
                 if (pomoStatusWithKey.sign != mySign) {
-                    statusCallback?.invoke(pomoStatusWithKey.reCorrectedPomoStatus())
+                    statusCallback?.invoke(pomoStatusWithKey.reCorrectedPomoStatus(System.currentTimeMillis()))
                 }
             }
         }

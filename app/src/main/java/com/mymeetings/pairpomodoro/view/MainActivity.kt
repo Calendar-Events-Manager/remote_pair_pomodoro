@@ -155,7 +155,9 @@ class MainActivity : AppCompatActivity() {
         if (pomodoroStatus?.pause == false) {
             wakeLock = WakeLockUtil.makeCPUPowerInWake(this, pomodoroStatus.balanceTime)
         } else {
-            wakeLock?.release()
+            if(wakeLock?.isHeld == true) {
+                wakeLock?.release()
+            }
         }
 
         if (!isServiceRunning) {

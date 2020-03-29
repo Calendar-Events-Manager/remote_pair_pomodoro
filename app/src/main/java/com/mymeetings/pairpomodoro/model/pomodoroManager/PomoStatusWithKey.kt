@@ -9,12 +9,12 @@ data class PomoStatusWithKey(
 ) {
     constructor() : this("", PomodoroStatus(), 0)
 
-    fun reCorrectedPomoStatus(): PomodoroStatus {
+    fun reCorrectedPomoStatus(currentTimeInMillis : Long): PomodoroStatus {
 
         val reCorrectedBalanceTime = if (pomodoroStatus.pause) {
             pomodoroStatus.balanceTime
         } else {
-            val diff = System.currentTimeMillis() - updatedTime
+            val diff = currentTimeInMillis - updatedTime
             val adjustedBalanceTime = pomodoroStatus.balanceTime - diff
             if (adjustedBalanceTime > 0) {
                 adjustedBalanceTime

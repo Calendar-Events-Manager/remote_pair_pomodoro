@@ -5,11 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroSyncer.FirebaseTimerSyncer
+import com.mymeetings.pairpomodoro.model.pomodoroSyncer.TimerSyncer
 
 object PomodoroMaintainer {
 
     private var pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
     private var pomodoroManager: PomodoroManager? = null
+    private val timerSyncer : TimerSyncer = FirebaseTimerSyncer()
 
     fun createOwnPomodoro(
         timerAlarm: TimerAlarm,
@@ -17,6 +20,7 @@ object PomodoroMaintainer {
     ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
+            timerSyncer = timerSyncer,
             updateCallback = ::update
         ).also {
             it.create(timerPreference)
@@ -29,6 +33,7 @@ object PomodoroMaintainer {
     ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
+            timerSyncer = timerSyncer,
             updateCallback = ::update
         ).also {
             it.sync(shareKey)
