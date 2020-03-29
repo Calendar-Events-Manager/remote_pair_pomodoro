@@ -75,7 +75,7 @@ class PomodorService : Service(), Observer<PomodoroStatus> {
             .setContentText("Pomodoro is running in foreground")
             .setWhen(System.currentTimeMillis())
             .setUsesChronometer(true)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_stat_pomodoro)
             .setContentIntent(pendingIntent)
             .build()
     }
