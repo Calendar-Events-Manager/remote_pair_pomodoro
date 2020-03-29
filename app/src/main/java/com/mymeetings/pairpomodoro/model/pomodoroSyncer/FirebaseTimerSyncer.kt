@@ -16,17 +16,20 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
 
     private var createdCallback: ((TimerPreference) -> Unit)? = null
     private var statusCallback: ((PomodoroStatus) -> Unit)? = null
+    private var keyNotFoundCallback: (() -> Unit)? = null
     private var sharingKey: String? = null
     private val mySign: String = Utils.getRandomId()
 
     override fun registerTimerUpdate(
         sharingKey: String,
         createdCallback: ((TimerPreference) -> Unit)?,
-        statusCallback: ((PomodoroStatus) -> Unit)?
+        statusCallback: ((PomodoroStatus) -> Unit)?,
+        keyNotFoundCallback: (() -> Unit)?
     ) {
         this.sharingKey = sharingKey
         this.createdCallback = createdCallback
         this.statusCallback = statusCallback
+        this.keyNotFoundCallback = keyNotFoundCallback
 
         getInfoDBReference(sharingKey).addValueEventListener(this)
     }
@@ -34,6 +37,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
     override fun unregisterTimerUpdate() {
         this.createdCallback = null
         this.statusCallback = null
+        this.keyNotFoundCallback = null
 
         sharingKey?.let {
             getInfoDBReference(it).removeEventListener(this)
@@ -71,11 +75,15 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
 
     override fun onDataChange(datasnapshot: DataSnapshot) {
         if (datasnapshot.key == INFO_REF_KEY) {
-            datasnapshot.getValue(SyncableTimerPreference::class.java)?.let { timerPreference ->
+            val timerPreference = datasnapshot.getValue(SyncableTimerPreference::class.java)
+            if (timerPreference != null) {
                 sharingKey?.let {
+                    getInfoDBReference(it).removeEventListener(this)
                     getSyncDBReference(it).addValueEventListener(this)
                     createdCallback?.invoke(timerPreference)
                 }
+            } else {
+                keyNotFoundCallback?.invoke()
             }
         } else if (datasnapshot.key == SYNC_REF_KEY) {
             datasnapshot.getValue(PomoStatusWithKey::class.java)?.let { pomoStatusWithKey ->

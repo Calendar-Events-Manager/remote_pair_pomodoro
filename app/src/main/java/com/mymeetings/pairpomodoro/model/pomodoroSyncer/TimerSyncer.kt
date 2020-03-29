@@ -8,7 +8,8 @@ interface TimerSyncer {
     fun registerTimerUpdate(
         sharingKey : String,
         createdCallback: ((TimerPreference) -> Unit)? = null,
-        statusCallback: ((PomodoroStatus) -> Unit)? = null
+        statusCallback: ((PomodoroStatus) -> Unit)? = null,
+        keyNotFoundCallback : (() -> Unit)? = null
     )
 
     fun unregisterTimerUpdate()

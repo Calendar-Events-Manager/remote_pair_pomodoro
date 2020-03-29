@@ -13,6 +13,7 @@ import org.junit.Test
 
 typealias CreationCallback = (TimerPreference) -> Unit
 typealias UpdateCallback = (PomodoroStatus) -> Unit
+typealias SyncFailedCallback = () -> Unit
 
 class PomodoroManagerTest {
 
@@ -57,6 +58,7 @@ class PomodoroManagerTest {
 
         val capturedCreatedCallback = CapturingSlot<CreationCallback>()
         val capturedUpdateCallback = CapturingSlot<UpdateCallback>()
+        val syncFailedCallback = mockk<SyncFailedCallback>()
 
         val expectedStatus = PomodoroStatus(
             pomoState = PomoState.Focus,
@@ -69,26 +71,60 @@ class PomodoroManagerTest {
             timerSyncer.registerTimerUpdate(
                 sharingKey = sharingKey,
                 createdCallback = capture(capturedCreatedCallback),
-                statusCallback = capture(capturedUpdateCallback)
+                statusCallback = capture(capturedUpdateCallback),
+                keyNotFoundCallback = any()
             )
         } answers {
             capturedCreatedCallback.captured.invoke(timerPreference)
             capturedUpdateCallback.captured.invoke(expectedStatus)
         }
 
-        pomodoroManager.sync(sharingKey)
-
+        pomodoroManager.sync(sharingKey, syncFailedCallback)
 
         verify {
             timerSyncer.registerTimerUpdate(
                 sharingKey = sharingKey,
                 statusCallback = any(),
-                createdCallback = any()
+                createdCallback = any(),
+                keyNotFoundCallback = any()
             )
             updateCallback.invoke(expectedStatus)
         }
         verify(exactly = 0) {
             timerSyncer.setTimerStatus(expectedStatus)
+        }
+    }
+
+    @Test
+    fun `create with Mode_SYNC should throw sync failed if it failed to sync sharing key`() {
+
+        val capturedCreatedCallback = CapturingSlot<CreationCallback>()
+        val capturedUpdateCallback = CapturingSlot<UpdateCallback>()
+        val capturedSyncFailedCallback = CapturingSlot<SyncFailedCallback>()
+        val syncFailedCallback = mockk<SyncFailedCallback>()
+
+        every { syncFailedCallback.invoke() } just Runs
+        every {
+            timerSyncer.registerTimerUpdate(
+                sharingKey = sharingKey,
+                createdCallback = capture(capturedCreatedCallback),
+                statusCallback = capture(capturedUpdateCallback),
+                keyNotFoundCallback = capture(capturedSyncFailedCallback)
+            )
+        } answers {
+            capturedSyncFailedCallback.captured.invoke()
+        }
+
+        pomodoroManager.sync(sharingKey, syncFailedCallback)
+
+        verify {
+            timerSyncer.registerTimerUpdate(
+                sharingKey = sharingKey,
+                statusCallback = any(),
+                createdCallback = any(),
+                keyNotFoundCallback = any()
+            )
+            syncFailedCallback.invoke()
         }
     }
 

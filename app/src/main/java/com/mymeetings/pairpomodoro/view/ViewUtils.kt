@@ -59,6 +59,23 @@ object ViewUtils {
         builder.show()
     }
 
+    fun infoDialog(
+        context: Context,
+        message: String,
+        confirmCallback: () -> Unit
+    ) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder.setMessage(message)
+        builder.setPositiveButton(
+            context.getString(R.string.ok)
+        ) { dialog, _ ->
+            confirmCallback()
+            dialog.dismiss()
+        }
+
+        builder.show()
+    }
+
     fun copyTextToClipBoard(context: Context, textToCopy: String) {
         val clipboard: ClipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

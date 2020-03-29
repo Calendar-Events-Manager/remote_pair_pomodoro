@@ -14,15 +14,19 @@ class PomodoroManager(
     private val timerAlarm: TimerAlarm,
     private val timerSyncer: TimerSyncer,
     private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)
-) : TimerUpdater {
+    ) : TimerUpdater {
 
     private var pomodoroTimer: PomodoroTimer? = null
 
-    fun sync(shareKey: String) {
+    fun sync(
+        shareKey: String,
+        syncFailedCallback: (() -> Unit)
+    ) {
         timerSyncer.registerTimerUpdate(
             sharingKey = shareKey,
             createdCallback = ::onTimerSyncCreate,
-            statusCallback = ::onTimerSyncUpdate
+            statusCallback = ::onTimerSyncUpdate,
+            keyNotFoundCallback = syncFailedCallback
         )
     }
 

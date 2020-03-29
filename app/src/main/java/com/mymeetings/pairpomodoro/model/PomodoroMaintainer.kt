@@ -1,5 +1,6 @@
 package com.mymeetings.pairpomodoro.model
 
+import SingleLiveEvent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
@@ -10,9 +11,11 @@ import com.mymeetings.pairpomodoro.model.pomodoroSyncer.TimerSyncer
 
 object PomodoroMaintainer {
 
-    private var pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
+    private val pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
+    private val timerSyncer: TimerSyncer = FirebaseTimerSyncer()
+    private val syncFailedEvent: SingleLiveEvent<Unit> = SingleLiveEvent()
+
     private var pomodoroManager: PomodoroManager? = null
-    private val timerSyncer : TimerSyncer = FirebaseTimerSyncer()
 
     fun createOwnPomodoro(
         timerAlarm: TimerAlarm,
@@ -36,7 +39,10 @@ object PomodoroMaintainer {
             timerSyncer = timerSyncer,
             updateCallback = ::update
         ).also {
-            it.sync(shareKey)
+            it.sync(
+                shareKey = shareKey,
+                syncFailedCallback = ::syncFailed
+            )
         }
     }
 
@@ -58,10 +64,15 @@ object PomodoroMaintainer {
     }
 
     fun getPomodoroStatusLiveData(): LiveData<PomodoroStatus> = pomodoroStatusLiveData
+    fun getSyncFailedLiveData(): LiveData<Unit> = syncFailedEvent
     fun shareKey() = pomodoroManager?.getShareKey() ?: ""
 
     private fun update(pomodoroStatus: PomodoroStatus) {
         pomodoroStatusLiveData.postValue(pomodoroStatus)
+    }
+
+    private fun syncFailed() {
+        syncFailedEvent.value = Unit
     }
 
 }

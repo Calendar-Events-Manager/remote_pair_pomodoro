@@ -43,6 +43,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        pomodoroViewModel.syncFailedLiveData.observe(this, Observer {
+            ViewUtils.infoDialog(this, "Timer not available for this key") {
+                pomodoroViewModel.close()
+            }
+        })
+
         pauseButton.setOnClickListener {
             pomodoroViewModel.pause()
         }
@@ -155,7 +161,7 @@ class MainActivity : AppCompatActivity() {
         if (pomodoroStatus?.pause == false) {
             wakeLock = WakeLockUtil.makeCPUPowerInWake(this, pomodoroStatus.balanceTime)
         } else {
-            if(wakeLock?.isHeld == true) {
+            if (wakeLock?.isHeld == true) {
                 wakeLock?.release()
             }
         }

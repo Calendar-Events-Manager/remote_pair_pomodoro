@@ -9,6 +9,7 @@ import java.util.*
 class PomodoroViewModel : ViewModel() {
 
     val pomodoroStatusLiveData = PomodoroMaintainer.getPomodoroStatusLiveData()
+    val syncFailedLiveData = PomodoroMaintainer.getSyncFailedLiveData()
     val sharingKey get() = PomodoroMaintainer.shareKey()
 
     fun createOwnPomodoro(
