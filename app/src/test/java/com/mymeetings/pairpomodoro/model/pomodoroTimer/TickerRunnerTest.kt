@@ -26,7 +26,7 @@ class TickerRunnerTest {
         tickerRunner.run(ticker)
 
         delay(2000)
-        verify(exactly = 2) { ticker.tick() }
+        verify(exactly = 2) { ticker.tick(1000) }
     }
 
     @Test
@@ -36,6 +36,6 @@ class TickerRunnerTest {
         tickerRunner.cancel()
         delay(1000)
 
-        verify(exactly = 1) { ticker.tick() }
+        verify(exactly = 1) { ticker.tick(1000) }
     }
 }

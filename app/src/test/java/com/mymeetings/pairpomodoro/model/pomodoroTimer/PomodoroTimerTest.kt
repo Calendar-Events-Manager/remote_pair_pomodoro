@@ -5,14 +5,10 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarmType
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
-import com.mymeetings.pairpomodoro.utils.ClockUtil
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class PomodoroTimerTest {
 
@@ -26,8 +22,6 @@ class PomodoroTimerTest {
     private lateinit var timerAlarm: TimerAlarm
     @MockK
     private lateinit var timerUpdater: TimerUpdater
-    @MockK
-    private lateinit var clockUtil: ClockUtil
 
     private val focusTime = 3000L
     private val shortBreakTime = 1000L
@@ -38,7 +32,6 @@ class PomodoroTimerTest {
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        every { clockUtil.getDiff() } returns 0
         every { timerPreference.getFocusTime() } returns focusTime
         every { timerPreference.getShortBreakTime() } returns shortBreakTime
         every { timerPreference.getLongBreakTime() } returns longBreakTime
@@ -48,8 +41,7 @@ class PomodoroTimerTest {
             tickerRunner = tickerRunner,
             timerPreference = timerPreference,
             timerAlarm = timerAlarm,
-            timerUpdater = timerUpdater,
-            clockUtil = clockUtil
+            timerUpdater = timerUpdater
         )
     }
 
@@ -59,8 +51,7 @@ class PomodoroTimerTest {
         val timePassed = 1000L
 
         pomodoroTimer.start()
-        every { clockUtil.getDiff() } returns timePassed
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(timePassed)
 
         val expectedFirstPomoStatus = PomodoroStatus(
             pomoState = PomoState.Focus,
@@ -85,8 +76,7 @@ class PomodoroTimerTest {
     fun `start with tick should change pomostate to shortBreak when time is over and update info in timerUpdater`() {
 
         pomodoroTimer.start()
-        every { clockUtil.getDiff() } returns focusTime
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(focusTime)
 
         val expectedPomoStatus = PomodoroStatus(
             pomoState = PomoState.ShortBreak,
@@ -102,18 +92,13 @@ class PomodoroTimerTest {
     fun `start with tick should change pomostate to LongBreak when time is over and update info in timerUpdater`() {
 
         pomodoroTimer.start()
-        every { clockUtil.getDiff() } returns focusTime
-        pomodoroTimer.tick()
-        every { clockUtil.getDiff() } returns shortBreakTime
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(focusTime)
+        pomodoroTimer.tick(shortBreakTime)
 
-        every { clockUtil.getDiff() } returns focusTime
-        pomodoroTimer.tick()
-        every { clockUtil.getDiff() } returns shortBreakTime
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(focusTime)
+        pomodoroTimer.tick(shortBreakTime)
 
-        every { clockUtil.getDiff() } returns focusTime
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(focusTime)
 
         val expectedPomoStatus = PomodoroStatus(
             pomoState = PomoState.LongBreak,
@@ -130,8 +115,7 @@ class PomodoroTimerTest {
         val timeToPass = 1000L
 
         pomodoroTimer.start()
-        every { clockUtil.getDiff() } returns timeToPass
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(timeToPass)
         pomodoroTimer.pause()
 
         val expectedPomoStatusForStart = PomodoroStatus(
@@ -159,8 +143,7 @@ class PomodoroTimerTest {
         val timeToPass = 1000L
 
         pomodoroTimer.start()
-        every { clockUtil.getDiff() } returns timeToPass
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(timeToPass)
         pomodoroTimer.reset()
 
         val expectedPomoStatusForStart = PomodoroStatus(
@@ -195,8 +178,7 @@ class PomodoroTimerTest {
         )
 
         pomodoroTimer.sync(pomoStatus)
-        every { clockUtil.getDiff() } returns timeToPass
-        pomodoroTimer.tick()
+        pomodoroTimer.tick(timeToPass)
 
         verifyOrder {
             tickerRunner.run(pomodoroTimer)

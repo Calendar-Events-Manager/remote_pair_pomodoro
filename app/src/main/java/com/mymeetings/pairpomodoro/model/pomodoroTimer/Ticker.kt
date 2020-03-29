@@ -2,5 +2,5 @@ package com.mymeetings.pairpomodoro.model.pomodoroTimer
 
 interface Ticker {
 
-    fun tick()
+    fun tick(elapsedTime : Long)
 }

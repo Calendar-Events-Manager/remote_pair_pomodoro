@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit
 class TickerRunner {
 
     private var job: Job? = null
+    private val delay = TimeUnit.SECONDS.toMillis(1)
 
     fun run(timeTicker: Ticker) {
         cancelPrevious()
@@ -34,7 +35,9 @@ class TickerRunner {
         job = CoroutineScope(Dispatchers.Default).launch {
             while (isActive) {
                 tickerChannel.receive()
-                tickerTimer.tick()
+                if (isActive) {
+                    tickerTimer.tick(delay)
+                }
             }
         }
     }
