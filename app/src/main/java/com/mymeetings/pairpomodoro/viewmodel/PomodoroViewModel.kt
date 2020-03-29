@@ -19,6 +19,7 @@ class PomodoroViewModel : ViewModel() {
             timerAlarm = timerAlarm,
             timerPreference = timerPreference
         )
+        PomodoroMaintainer.start()
     }
 
     fun syncPomodoro(shareKey: String, timerAlarm: AndroidTimerAlarm) {

@@ -2,9 +2,8 @@ package com.mymeetings.pairpomodoro.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroCreationMode
-import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
+import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 
 object PomodoroMaintainer {
@@ -18,10 +17,9 @@ object PomodoroMaintainer {
     ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
-            timerPreference = timerPreference,
             updateCallback = ::update
         ).also {
-            it.create()
+            it.create(timerPreference)
         }
     }
 
@@ -31,11 +29,9 @@ object PomodoroMaintainer {
     ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
-            shareKey = shareKey,
-            pomodoroCreationMode = PomodoroCreationMode.SYNC,
             updateCallback = ::update
         ).also {
-            it.create()
+            it.sync(shareKey)
         }
     }
 

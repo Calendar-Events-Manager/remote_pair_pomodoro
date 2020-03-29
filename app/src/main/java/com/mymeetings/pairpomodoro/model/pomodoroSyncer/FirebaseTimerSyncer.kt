@@ -12,18 +12,19 @@ import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.toSyncableTimerPreference
 import com.mymeetings.pairpomodoro.utils.Utils
 
-class FirebaseTimerSyncer(
-    private val sharingKey: String
-) : TimerSyncer, ValueEventListener {
+class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
 
     private var createdCallback: ((TimerPreference) -> Unit)? = null
     private var statusCallback: ((PomodoroStatus) -> Unit)? = null
+    private var sharingKey: String? = null
     private val mySign: String = Utils.getRandomId()
 
     override fun registerTimerUpdate(
+        sharingKey: String,
         createdCallback: ((TimerPreference) -> Unit)?,
         statusCallback: ((PomodoroStatus) -> Unit)?
     ) {
+        this.sharingKey = sharingKey
         this.createdCallback = createdCallback
         this.statusCallback = statusCallback
 
@@ -34,23 +35,34 @@ class FirebaseTimerSyncer(
         this.createdCallback = null
         this.statusCallback = null
 
-        getInfoDBReference(sharingKey).removeEventListener(this)
-        getSyncDBReference(sharingKey).removeEventListener(this)
-        getMasterDbReference(sharingKey).onDisconnect().removeValue()
+        sharingKey?.let {
+            getInfoDBReference(it).removeEventListener(this)
+            getSyncDBReference(it).removeEventListener(this)
+            getMasterDbReference(it).onDisconnect().removeValue()
+        }
+        sharingKey = null
     }
 
     override fun setTimerCreationInfo(timerPreference: TimerPreference) {
-        getInfoDBReference(sharingKey).setValue(timerPreference.toSyncableTimerPreference())
+        sharingKey?.let {
+            getInfoDBReference(it).setValue(timerPreference.toSyncableTimerPreference())
+        }
     }
 
     override fun setTimerStatus(pomodoroStatus: PomodoroStatus) {
-        getSyncDBReference(sharingKey).setValue(
-            PomoStatusWithKey(
-                sign = mySign,
-                pomodoroStatus = pomodoroStatus,
-                updatedTime = System.currentTimeMillis()
+        sharingKey?.let {
+            getSyncDBReference(it).setValue(
+                PomoStatusWithKey(
+                    sign = mySign,
+                    pomodoroStatus = pomodoroStatus,
+                    updatedTime = System.currentTimeMillis()
+                )
             )
-        )
+        }
+    }
+
+    override fun getSharingKey(): String {
+        return sharingKey ?: ""
     }
 
     override fun onCancelled(ignore: DatabaseError) {
@@ -60,8 +72,10 @@ class FirebaseTimerSyncer(
     override fun onDataChange(datasnapshot: DataSnapshot) {
         if (datasnapshot.key == INFO_REF_KEY) {
             datasnapshot.getValue(SyncableTimerPreference::class.java)?.let { timerPreference ->
-                getSyncDBReference(sharingKey).addValueEventListener(this)
-                createdCallback?.invoke(timerPreference)
+                sharingKey?.let {
+                    getSyncDBReference(it).addValueEventListener(this)
+                    createdCallback?.invoke(timerPreference)
+                }
             }
         } else if (datasnapshot.key == SYNC_REF_KEY) {
             datasnapshot.getValue(PomoStatusWithKey::class.java)?.let { pomoStatusWithKey ->

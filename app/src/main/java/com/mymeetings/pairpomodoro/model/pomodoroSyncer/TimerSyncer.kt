@@ -6,6 +6,7 @@ import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 interface TimerSyncer {
 
     fun registerTimerUpdate(
+        sharingKey : String,
         createdCallback: ((TimerPreference) -> Unit)? = null,
         statusCallback: ((PomodoroStatus) -> Unit)? = null
     )
@@ -15,4 +16,6 @@ interface TimerSyncer {
     fun setTimerCreationInfo(timerPreference: TimerPreference)
 
     fun setTimerStatus(pomodoroStatus: PomodoroStatus)
+
+    fun getSharingKey(): String
 }

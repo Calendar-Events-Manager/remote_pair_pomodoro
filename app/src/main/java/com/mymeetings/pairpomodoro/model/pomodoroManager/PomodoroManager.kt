@@ -14,38 +14,38 @@ import com.mymeetings.pairpomodoro.utils.Utils
 
 class PomodoroManager(
     private val timerAlarm: TimerAlarm,
-    private val shareKey: String = Utils.getRandomAlphaNumeric(),
-    private val pomodoroCreationMode: PomodoroCreationMode = PomodoroCreationMode.CREATE,
-    private val timerPreference: TimerPreference = SyncableTimerPreference(),
-    private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)? = null
+    private val timerSyncer: TimerSyncer = FirebaseTimerSyncer(),
+    private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)
 ) : TimerUpdater {
 
     private var pomodoroTimer: PomodoroTimer? = null
-    private val timerSyncer: TimerSyncer = FirebaseTimerSyncer(shareKey)
 
-    fun create() {
-        if (pomodoroCreationMode == PomodoroCreationMode.CREATE) {
-            pomodoroTimer = PomodoroTimer(
-                tickerRunner = TickerRunner(),
-                timerPreference = timerPreference,
-                timerAlarm = timerAlarm,
-                timerUpdater = this
-            ).also {
-                it.start()
-            }
-            timerSyncer.registerTimerUpdate(
-                statusCallback = ::onTimerSyncUpdate
-            )
-            timerSyncer.setTimerCreationInfo(timerPreference)
-        } else {
-            timerSyncer.registerTimerUpdate(
-                createdCallback = ::onTimerSyncCreate,
-                statusCallback = ::onTimerSyncUpdate
-            )
-        }
+    fun sync(shareKey: String) {
+        timerSyncer.registerTimerUpdate(
+            sharingKey = shareKey,
+            createdCallback = ::onTimerSyncCreate,
+            statusCallback = ::onTimerSyncUpdate
+        )
     }
 
-    fun getShareKey() = shareKey
+    fun create(
+        timerPreference: TimerPreference
+    ) {
+        pomodoroTimer = PomodoroTimer(
+            tickerRunner = TickerRunner(),
+            timerPreference = timerPreference,
+            timerAlarm = timerAlarm,
+            timerUpdater = this
+        )
+        timerSyncer.registerTimerUpdate(
+            sharingKey = Utils.getRandomAlphaNumeric(),
+            statusCallback = ::onTimerSyncUpdate
+        )
+        timerSyncer.setTimerCreationInfo(timerPreference)
+
+    }
+
+    fun getShareKey() = timerSyncer.getSharingKey()
 
     fun start() {
         pomodoroTimer?.start()
@@ -65,7 +65,7 @@ class PomodoroManager(
     }
 
     override fun update(pomodoroStatus: PomodoroStatus, actionChanges: Boolean) {
-        updateCallback?.invoke(pomodoroStatus)
+        updateCallback.invoke(pomodoroStatus)
         if (actionChanges) {
             timerSyncer.setTimerStatus(pomodoroStatus)
         }
