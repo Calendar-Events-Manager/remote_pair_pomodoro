@@ -12,21 +12,6 @@ class PomodoroViewModel : ViewModel() {
     val syncFailedLiveData = PomodoroMaintainer.getSyncFailedLiveData()
     val sharingKey get() = PomodoroMaintainer.shareKey()
 
-    fun createOwnPomodoro(
-        timerAlarm: AndroidTimerAlarm,
-        timerPreference: TimerPreference
-    ) {
-        PomodoroMaintainer.createOwnPomodoro(
-            timerAlarm = timerAlarm,
-            timerPreference = timerPreference
-        )
-        PomodoroMaintainer.start()
-    }
-
-    fun syncPomodoro(shareKey: String, timerAlarm: AndroidTimerAlarm) {
-        PomodoroMaintainer.syncPomodoro(shareKey.toUpperCase(Locale.getDefault()).trim(), timerAlarm)
-    }
-
     fun pause() {
         PomodoroMaintainer.pause()
     }
@@ -37,9 +22,5 @@ class PomodoroViewModel : ViewModel() {
 
     fun reset() {
         PomodoroMaintainer.reset()
-    }
-
-    fun close() {
-        PomodoroMaintainer.clear()
     }
 }

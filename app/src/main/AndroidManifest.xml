@@ -25,7 +25,7 @@
             android:theme="@style/AppTheme.ToolBar" />
 
         <service
-            android:name=".PomodorService"
+            android:name=".PomodoroService"
             android:enabled="true" />
     </application>
 

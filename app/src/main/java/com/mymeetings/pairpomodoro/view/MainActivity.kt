@@ -1,19 +1,14 @@
 package com.mymeetings.pairpomodoro.view
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.PowerManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
-import com.mymeetings.pairpomodoro.PomodorService
+import com.mymeetings.pairpomodoro.PomodoroService
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.pomodoroAlarm.AndroidTimerAlarm
-import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
 import com.mymeetings.pairpomodoro.utils.Utils
 import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
 import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
@@ -24,17 +19,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pomodoroViewModel: PomodoroViewModel
 
-    private var wakeLock: PowerManager.WakeLock? = null
-
-    private var isServiceRunning = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         pomodoroViewModel = ViewModelProvider(this).get(PomodoroViewModel::class.java)
 
-        showSelectionView()
         pomodoroViewModel.pomodoroStatusLiveData.observe(this, Observer {
             if (it != null) {
                 showTimerView(it)
@@ -45,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         pomodoroViewModel.syncFailedLiveData.observe(this, Observer {
             ViewUtils.infoDialog(this, "Timer not available for this key") {
-                pomodoroViewModel.close()
+                PomodoroService.stopPomodoro(this)
             }
         })
 
@@ -66,16 +56,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         createButton.setOnClickListener {
-            pomodoroViewModel.createOwnPomodoro(
-                timerAlarm = AndroidTimerAlarm(this),
-                timerPreference = UserTimerPreference(this)
-            )
-            showTimerView(null)
+            PomodoroService.createOwnPomodoro(this)
         }
 
         syncButton.setOnClickListener {
             ViewUtils.buildInputDialog(this) {
-                pomodoroViewModel.syncPomodoro(it, AndroidTimerAlarm(this))
+                PomodoroService.syncPomodoro(this, it)
                 showTimerView(null)
             }
         }
@@ -83,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         closeButton.setOnClickListener {
             ViewUtils.confirmationDialog(this, getString(R.string.exit_app)) {
                 if (it) {
-                    pomodoroViewModel.close()
+                    PomodoroService.stopPomodoro(this)
                 }
             }
         }
@@ -96,6 +82,7 @@ class MainActivity : AppCompatActivity() {
             PreferenceActivity.open(this)
         }
 
+        showSelectionView()
     }
 
     private fun showTimerView(pomodoroStatus: PomodoroStatus?) {
@@ -157,40 +144,11 @@ class MainActivity : AppCompatActivity() {
 
         container.keepScreenOn =
             PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)
-
-        if (pomodoroStatus?.pause == false) {
-            wakeLock = WakeLockUtil.makeCPUPowerInWake(this, pomodoroStatus.balanceTime)
-        } else {
-            if (wakeLock?.isHeld == true) {
-                wakeLock?.release()
-            }
-        }
-
-        if (!isServiceRunning) {
-            isServiceRunning = true
-            startService()
-        }
     }
 
     private fun showSelectionView() {
         selectionLayout.visible()
         timerLayout.gone()
         container.keepScreenOn = false
-
-        if (isServiceRunning) {
-            stopService()
-            isServiceRunning = false
-        }
-    }
-
-    fun startService() {
-        val serviceIntent = Intent(this, PomodorService::class.java)
-        serviceIntent.putExtra("inputExtra", "Foreground Service Example in Android")
-        ContextCompat.startForegroundService(this, serviceIntent)
-    }
-
-    fun stopService() {
-        val serviceIntent = Intent(this, PomodorService::class.java)
-        stopService(serviceIntent)
     }
 }

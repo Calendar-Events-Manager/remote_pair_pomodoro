@@ -44,7 +44,6 @@ class PomodoroManager(
             statusCallback = ::onTimerSyncUpdate
         )
         timerSyncer.setTimerCreationInfo(timerPreference)
-
     }
 
     fun getShareKey() = timerSyncer.getSharingKey()
