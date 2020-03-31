@@ -14,4 +14,7 @@
     <string name="exit_app">Exit Timer</string>
     <string name="reset_timer">Reset Timer</string>
     <string name="sync_timer">Sync Timer</string>
+    <string name="pomodoro">Pomodoro</string>
+    <string name="timer_starting">Pomodoro timer is starting</string>
+    <string name="started">started</string>
 </resources>

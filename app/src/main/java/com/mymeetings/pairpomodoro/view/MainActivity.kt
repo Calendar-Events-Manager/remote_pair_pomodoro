@@ -40,17 +40,17 @@ class MainActivity : AppCompatActivity() {
         })
 
         pauseButton.setOnClickListener {
-            pomodoroViewModel.pause()
+            PomodoroService.pausePomodoro(this)
         }
 
         startButton.setOnClickListener {
-            pomodoroViewModel.start()
+            PomodoroService.startPomodoro(this)
         }
 
         resetButton.setOnClickListener {
             ViewUtils.confirmationDialog(this, getString(R.string.reset_timer)) {
                 if (it) {
-                    pomodoroViewModel.reset()
+                    PomodoroService.resetPomodoro(this)
                 }
             }
         }

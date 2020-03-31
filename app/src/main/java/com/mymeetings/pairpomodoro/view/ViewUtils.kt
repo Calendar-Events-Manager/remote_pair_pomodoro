@@ -79,7 +79,7 @@ object ViewUtils {
     fun copyTextToClipBoard(context: Context, textToCopy: String) {
         val clipboard: ClipboardManager =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("sharing key", textToCopy.toString())
+        val clip = ClipData.newPlainText("sharing key", textToCopy)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(context, context.getString(R.string.key_copied), Toast.LENGTH_SHORT).show()
     }
