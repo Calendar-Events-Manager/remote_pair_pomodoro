@@ -42,7 +42,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
         sharingKey?.let {
             getInfoDBReference(it).removeEventListener(this)
             getSyncDBReference(it).removeEventListener(this)
-            getMasterDbReference(it).onDisconnect().removeValue()
+            //Deleting this info in firebase db is handled by cron job by firebase functions.
         }
         sharingKey = null
     }
