@@ -12,7 +12,6 @@ import com.mymeetings.pairpomodoro.model.pomodoroSyncer.TimerSyncer
 object PomodoroMaintainer {
 
     private val pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
-    private val timerSyncer: TimerSyncer = FirebaseTimerSyncer()
     private val syncFailedEvent: SingleLiveEvent<Unit> = SingleLiveEvent()
 
     private var pomodoroManager: PomodoroManager? = null
@@ -23,7 +22,7 @@ object PomodoroMaintainer {
     ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
-            timerSyncer = timerSyncer,
+            timerSyncer = FirebaseTimerSyncer(),
             updateCallback = ::update
         ).also {
             it.create(timerPreference)
@@ -36,7 +35,7 @@ object PomodoroMaintainer {
     ) {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
-            timerSyncer = timerSyncer,
+            timerSyncer = FirebaseTimerSyncer(),
             updateCallback = ::update
         ).also {
             it.sync(
