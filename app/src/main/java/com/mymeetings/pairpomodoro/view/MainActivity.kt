@@ -1,74 +1,55 @@
 package com.mymeetings.pairpomodoro.view
 
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.os.Messenger
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
-import com.mymeetings.pairpomodoro.PomodoroService
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.service.ActivityMessenger
+import com.mymeetings.pairpomodoro.service.PomodoroService
 import com.mymeetings.pairpomodoro.utils.Utils
-import com.mymeetings.pairpomodoro.view.messenger.PomoMessenger
 import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
-import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(), ServiceConnection {
 
-    private lateinit var pomodoroViewModel: PomodoroViewModel
-
-    private val pomoMessenger = PomoMessenger()
+    private val activityMessenger = ActivityMessenger(::showStatus, ::keyNotFound)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        pomodoroViewModel = ViewModelProvider(this).get(PomodoroViewModel::class.java)
-
-        pomodoroViewModel.pomodoroStatusLiveData.observe(this, Observer {
-            if (it != null) {
-                showTimerView(it)
-            } else {
-                showSelectionView()
-            }
-        })
-
-        pomodoroViewModel.syncFailedLiveData.observe(this, Observer {
-            ViewUtils.infoDialog(this, "Timer not available for this key") {
-                PomodoroService.stopPomodoro(this)
-            }
-        })
-
         pauseButton.setOnClickListener {
-            PomodoroService.pausePomodoro(this)
+            activityMessenger.pausePomodoro()
         }
 
         startButton.setOnClickListener {
-            PomodoroService.startPomodoro(this)
+            activityMessenger.startPomodoro()
         }
 
         resetButton.setOnClickListener {
             ViewUtils.confirmationDialog(this, getString(R.string.reset_timer)) {
                 if (it) {
-                    PomodoroService.resetPomodoro(this)
+                    activityMessenger.resetPomodoro()
                 }
             }
         }
 
         createButton.setOnClickListener {
-            PomodoroService.createOwnPomodoro(this)
+            activityMessenger.createOwnPomodoro()
         }
 
         syncButton.setOnClickListener {
             ViewUtils.buildInputDialog(this) {
-                PomodoroService.syncPomodoro(this, it)
+                activityMessenger.syncPomodoro(it)
                 showTimerView(null)
             }
         }
@@ -76,7 +57,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         closeButton.setOnClickListener {
             ViewUtils.confirmationDialog(this, getString(R.string.exit_app)) {
                 if (it) {
-                    PomodoroService.stopPomodoro(this)
+                    activityMessenger.closePomodoro()
                 }
             }
         }
@@ -90,6 +71,20 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         }
 
         showSelectionView()
+    }
+
+    private fun showStatus(pomodoroStatus: PomodoroStatus?) {
+        if (pomodoroStatus != null) {
+            showTimerView(pomodoroStatus)
+        } else {
+            showSelectionView()
+        }
+    }
+
+    private fun keyNotFound() {
+        ViewUtils.infoDialog(this, "Timer not available for this key") {
+            activityMessenger.closePomodoro()
+        }
     }
 
     private fun showTimerView(pomodoroStatus: PomodoroStatus?) {
@@ -120,7 +115,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
             }
         }
 
-        sharingKeyText.text = pomodoroViewModel.sharingKey
+        //sharingKeyText.text = pomodoroViewModel.sharingKey
 
         val mode = when (pomodoroStatus?.pomoState ?: PomoState.Focus) {
             PomoState.Focus -> {
@@ -153,6 +148,16 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
             PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)
     }
 
+    override fun onStart() {
+        super.onStart()
+        bindService(Intent(this, PomodoroService::class.java), this, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(this)
+    }
+
     private fun showSelectionView() {
         selectionLayout.visible()
         timerLayout.gone()
@@ -160,10 +165,10 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        pomoMessenger.onDisconnect()
+        activityMessenger.onDisconnect()
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        pomoMessenger.onConnect(Messenger(service))
+        activityMessenger.onConnect(Messenger(service))
     }
 }

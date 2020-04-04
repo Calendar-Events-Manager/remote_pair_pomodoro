@@ -1,4 +1,4 @@
-package com.mymeetings.pairpomodoro
+package com.mymeetings.pairpomodoro.service
 
 import android.app.Service
 import android.content.Context
@@ -16,15 +16,30 @@ import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
 import com.mymeetings.pairpomodoro.view.NotificationUtils
 import java.util.*
 
-class PomodoroService : Service(), Observer<PomodoroStatus> {
+class PomodoroService : Service() {
 
     private var pomodoroStatus: PomodoroStatus? = null
 
     private lateinit var timerAlarm: TimerAlarm
     private lateinit var timerPreference: TimerPreference
     private lateinit var wakeLock: PowerManager.WakeLock
-    private var replyMessenger : Messenger? = null
-    private val recieveMessenger = Messenger(PomoHandler())
+    private val pomodoroMaintainer = PomodoroMaintainer()
+    private val serviceMessenger = ServiceMessenger(::onCommandRecieved)
+
+    private val statusObserver = Observer<PomodoroStatus> { pomodoroStatus ->
+        serviceMessenger.sendPomodoroStatus(pomodoroMaintainer.shareKey(), pomodoroStatus)
+        if (this.pomodoroStatus?.pause != pomodoroStatus?.pause) {
+            if (pomodoroStatus != null) {
+                checkAndUpdateNotification(pomodoroStatus)
+            }
+            checkAndUpdateCPUWake(pomodoroStatus)
+            this.pomodoroStatus = pomodoroStatus
+        }
+    }
+
+    private val syncFailedObserver = Observer<Unit> {
+        serviceMessenger.sendKeyNotFound()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -36,20 +51,24 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
             packageName
         )
 
-        PomodoroMaintainer.getPomodoroStatusLiveData().observeForever(this)
+        pomodoroMaintainer.getPomodoroStatusLiveData().observeForever(statusObserver)
+        pomodoroMaintainer.getSyncFailedLiveData().observeForever(syncFailedObserver)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return recieveMessenger.binder
+        return serviceMessenger.getBinder()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val timerType = intent?.getIntExtra(TIMER_TYPE_KEY, TIMER_TYPE_CREATE) ?: TIMER_TYPE_CREATE
+        val timerType = intent?.getIntExtra(
+            TIMER_TYPE_KEY,
+            TIMER_TYPE_CREATE
+        ) ?: TIMER_TYPE_CREATE
 
         if (timerType == TIMER_TYPE_CLOSE) {
 
-            PomodoroMaintainer.clear()
+            pomodoroMaintainer.clear()
 
             stopForeground(true)
             stopSelf()
@@ -68,28 +87,28 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
 
             when (timerType) {
                 TIMER_TYPE_CREATE -> {
-                    PomodoroMaintainer.createOwnPomodoro(
+                    pomodoroMaintainer.createOwnPomodoro(
                         timerAlarm,
                         timerPreference
                     )
-                    PomodoroMaintainer.start()
+                    pomodoroMaintainer.start()
                 }
                 TIMER_TYPE_SYNC -> {
                     if (sharingKey != null) {
-                        PomodoroMaintainer.syncPomodoro(
+                        pomodoroMaintainer.syncPomodoro(
                             sharingKey.toUpperCase(Locale.getDefault()).trim(),
                             timerAlarm
                         )
                     }
                 }
                 TIMER_TYPE_START -> {
-                    PomodoroMaintainer.start()
+                    pomodoroMaintainer.start()
                 }
                 TIMER_TYPE_PAUSE -> {
-                    PomodoroMaintainer.pause()
+                    pomodoroMaintainer.pause()
                 }
                 TIMER_TYPE_RESET -> {
-                    PomodoroMaintainer.reset()
+                    pomodoroMaintainer.reset()
                 }
             }
 
@@ -97,20 +116,43 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
         }
     }
 
+    fun onCommandRecieved(@MessengerProtocol.Command command: Int, sharingKey: String? = null) {
+        when (command) {
+            MessengerProtocol.COMMAND_CREATE -> {
+                pomodoroMaintainer.createOwnPomodoro(
+                    timerAlarm,
+                    timerPreference
+                )
+                pomodoroMaintainer.start()
+            }
+            MessengerProtocol.COMMAND_SYNC -> {
+                if (sharingKey != null) {
+                    pomodoroMaintainer.syncPomodoro(
+                        sharingKey.toUpperCase(Locale.getDefault()).trim(),
+                        timerAlarm
+                    )
+                }
+            }
+            MessengerProtocol.COMMAND_START -> {
+                pomodoroMaintainer.start()
+            }
+            MessengerProtocol.COMMAND_PAUSE -> {
+                pomodoroMaintainer.pause()
+            }
+            MessengerProtocol.COMMAND_RESET -> {
+                pomodoroMaintainer.reset()
+            }
+            MessengerProtocol.COMMAND_CLOSE -> {
+                pomodoroMaintainer.clear()
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
-        PomodoroMaintainer.getPomodoroStatusLiveData().removeObserver(this)
-    }
-
-    override fun onChanged(pomodoroStatus: PomodoroStatus?) {
-        if (this.pomodoroStatus?.pause != pomodoroStatus?.pause) {
-            if (pomodoroStatus != null) {
-                checkAndUpdateNotification(pomodoroStatus)
-            }
-            checkAndUpdateCPUWake(pomodoroStatus)
-            this.pomodoroStatus = pomodoroStatus
-        }
+        pomodoroMaintainer.getPomodoroStatusLiveData().removeObserver(statusObserver)
+        pomodoroMaintainer.getSyncFailedLiveData().removeObserver(syncFailedObserver)
     }
 
     private fun checkAndUpdateCPUWake(pomodoroStatus: PomodoroStatus?) {
@@ -128,16 +170,6 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
         NotificationUtils.showRunningNotification(this, pomodoroStatus)
     }
 
-    inner class PomoHandler : Handler() {
-
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-
-            val data = msg.data
-
-        }
-    }
-
     companion object {
         private const val TIMER_TYPE_KEY = "timer_type"
         private const val SHARING_KEY = "sharing_key"
@@ -150,44 +182,73 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
 
         fun createOwnPomodoro(context: Context) {
             val intent = Intent(context, PomodoroService::class.java)
-            intent.putExtra(TIMER_TYPE_KEY, TIMER_TYPE_CREATE)
+            intent.putExtra(
+                TIMER_TYPE_KEY,
+                TIMER_TYPE_CREATE
+            )
             ContextCompat.startForegroundService(context, intent)
         }
 
         fun syncPomodoro(context: Context, sharingKey: String) {
             val intent = Intent(context, PomodoroService::class.java)
-            intent.putExtra(TIMER_TYPE_KEY, TIMER_TYPE_SYNC)
+            intent.putExtra(
+                TIMER_TYPE_KEY,
+                TIMER_TYPE_SYNC
+            )
             intent.putExtra(SHARING_KEY, sharingKey)
             ContextCompat.startForegroundService(context, intent)
         }
 
         fun stopPomodoro(context: Context) {
             val intent = Intent(context, PomodoroService::class.java)
-            intent.putExtra(TIMER_TYPE_KEY, TIMER_TYPE_CLOSE)
+            intent.putExtra(
+                TIMER_TYPE_KEY,
+                TIMER_TYPE_CLOSE
+            )
             ContextCompat.startForegroundService(context, intent)
         }
 
         fun getStartPomodoroIntent(context: Context) =
             Intent(context, PomodoroService::class.java).apply {
-                putExtra(TIMER_TYPE_KEY, TIMER_TYPE_START)
+                putExtra(
+                    TIMER_TYPE_KEY,
+                    TIMER_TYPE_START
+                )
             }
 
         fun startPomodoro(context: Context) =
-            ContextCompat.startForegroundService(context, getStartPomodoroIntent(context))
+            ContextCompat.startForegroundService(
+                context,
+                getStartPomodoroIntent(
+                    context
+                )
+            )
 
 
         fun getPausePomodoroIntent(context: Context) =
             Intent(context, PomodoroService::class.java).apply {
-                putExtra(TIMER_TYPE_KEY, TIMER_TYPE_PAUSE)
+                putExtra(
+                    TIMER_TYPE_KEY,
+                    TIMER_TYPE_PAUSE
+                )
             }
 
         fun pausePomodoro(context: Context) =
-            ContextCompat.startForegroundService(context, getPausePomodoroIntent(context))
+            ContextCompat.startForegroundService(
+                context,
+                getPausePomodoroIntent(
+                    context
+                )
+            )
 
         fun resetPomodoro(context: Context) {
             val intent = Intent(context, PomodoroService::class.java)
-            intent.putExtra(TIMER_TYPE_KEY, TIMER_TYPE_RESET)
+            intent.putExtra(
+                TIMER_TYPE_KEY,
+                TIMER_TYPE_RESET
+            )
             ContextCompat.startForegroundService(context, intent)
         }
     }
+
 }

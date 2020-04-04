@@ -9,7 +9,7 @@ import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import com.mymeetings.pairpomodoro.model.pomodoroSyncer.FirebaseTimerSyncer
 import com.mymeetings.pairpomodoro.model.pomodoroSyncer.TimerSyncer
 
-object PomodoroMaintainer {
+class PomodoroMaintainer {
 
     private val pomodoroStatusLiveData: MutableLiveData<PomodoroStatus> = MutableLiveData()
     private val syncFailedEvent: SingleLiveEvent<Unit> = SingleLiveEvent()
