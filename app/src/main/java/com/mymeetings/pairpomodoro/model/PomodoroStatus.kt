@@ -6,10 +6,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class PomodoroStatus(
-    @PropertyName("pomoState") val pomoState: PomoState,
-    @PropertyName("balanceTime") val balanceTime: Long,
-    @PropertyName("shortBreaksLeft") val shortBreaksLeft: Int,
-    @PropertyName("pause") val pause: Boolean
-) : Parcelable {
-    constructor() : this(PomoState.Focus, 0L, 0, true)
-}
+    @PropertyName("pomoState") val pomoState: PomoState = PomoState.Focus,
+    @PropertyName("balanceTime") val balanceTime: Long = 0,
+    @PropertyName("shortBreaksLeft") val shortBreaksLeft: Int = 0,
+    @PropertyName("pause") val pause: Boolean = false
+) : Parcelable

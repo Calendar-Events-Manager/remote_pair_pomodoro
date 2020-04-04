@@ -33,6 +33,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:layout_margin="28dp"
+                android:contentDescription="@string/exit_timer_button"
                 android:background="@drawable/ic_exit_24dp" />
 
         </LinearLayout>
@@ -182,6 +183,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:layout_margin="28dp"
+                android:contentDescription="@string/timer_settings_button"
                 android:background="@drawable/ic_settings_24dp" />
 
 

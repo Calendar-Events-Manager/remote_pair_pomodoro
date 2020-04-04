@@ -4,12 +4,10 @@ import com.google.firebase.database.PropertyName
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 
 data class PomoStatusWithKey(
-    @PropertyName("sign") val sign: String,
-    @PropertyName("pomodoroStatus") val pomodoroStatus: PomodoroStatus,
-    @PropertyName("updatedTime") val updatedTime: Long
+    @PropertyName("sign") val sign: String = "",
+    @PropertyName("pomodoroStatus") val pomodoroStatus: PomodoroStatus = PomodoroStatus(),
+    @PropertyName("updatedTime") val updatedTime: Long = 0
 ) {
-    constructor() : this("", PomodoroStatus(), 0)
-
     fun reCorrectedPomoStatus(currentTimeInMillis : Long): PomodoroStatus {
 
         val reCorrectedBalanceTime = if (pomodoroStatus.pause) {

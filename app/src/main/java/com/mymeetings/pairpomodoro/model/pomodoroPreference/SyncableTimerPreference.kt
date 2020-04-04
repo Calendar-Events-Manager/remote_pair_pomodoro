@@ -10,13 +10,6 @@ data class SyncableTimerPreference(
     @PropertyName("shortBreakCount") private val shortBreakCount: Int = 3
 ) : TimerPreference {
 
-    constructor() : this(
-        focusTime = TimeUnit.MINUTES.toMillis(25),
-        shortBreakTime = TimeUnit.MINUTES.toMillis(3),
-        longBreakTime = TimeUnit.MINUTES.toMillis(10),
-        shortBreakCount = 3
-    )
-
     override fun getFocusTime() = focusTime
 
     override fun getShortBreakTime() = shortBreakTime

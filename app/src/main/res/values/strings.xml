@@ -17,4 +17,6 @@
     <string name="pomodoro">Pomodoro</string>
     <string name="timer_starting">Pomodoro timer is starting</string>
     <string name="started">started</string>
+    <string name="exit_timer_button">Exit Timer Button</string>
+    <string name="timer_settings_button">Timer Settings Button</string>
 </resources>

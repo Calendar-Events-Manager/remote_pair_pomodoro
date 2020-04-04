@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.mymeetings.pairpomodoro.R
@@ -17,7 +16,7 @@ object ViewUtils {
     fun buildInputDialog(context: Context, textCallback: (String) -> Unit) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
 
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_sharing_key, null)
+        val view = View.inflate(context, R.layout.dialog_sharing_key, null)
         builder.setView(view)
 
         val dialog = builder.show()
@@ -87,14 +86,6 @@ object ViewUtils {
 
 fun View.gone() {
     visibility = View.GONE
-}
-
-fun View.enable() {
-    isEnabled = true
-}
-
-fun View.disable() {
-    isEnabled = false
 }
 
 fun View.visible() {

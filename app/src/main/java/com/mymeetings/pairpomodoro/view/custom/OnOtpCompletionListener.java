@@ -1,6 +1,6 @@
 package com.mymeetings.pairpomodoro.view.custom;
 
-public interface OnOtpCompletionListener {
+interface OnOtpCompletionListener {
   void onOtpCompleted(String otp);
 
 }

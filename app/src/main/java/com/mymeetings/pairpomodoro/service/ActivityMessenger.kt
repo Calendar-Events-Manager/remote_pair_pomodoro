@@ -75,9 +75,7 @@ class ActivityMessenger(
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 
-            val reply = msg.data?.getInt(MessengerProtocol.REPLY_KEY)
-
-            when (reply) {
+            when (msg.data?.getInt(MessengerProtocol.REPLY_KEY)) {
                 MessengerProtocol.REPLY_STATUS -> {
                     val pomodoroStatus =
                         msg.data?.getParcelable<PomodoroStatus>(MessengerProtocol.STATUS_KEY)

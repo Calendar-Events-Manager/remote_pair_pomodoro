@@ -64,7 +64,7 @@ public class OtpView extends AppCompatEditText {
   private static final int VIEW_TYPE_RECTANGLE = 0;
   private static final int VIEW_TYPE_LINE = 1;
   private static final int VIEW_TYPE_NONE = 2;
-  private int viewType;
+  private final int viewType;
   private int otpViewItemCount;
   private int otpViewItemWidth;
   private int otpViewItemHeight;
@@ -91,7 +91,7 @@ public class OtpView extends AppCompatEditText {
   private int itemBackgroundResource;
   private Drawable itemBackground;
   private boolean hideLineWhenFilled;
-  private boolean rtlTextDirection;
+  private final boolean rtlTextDirection;
   private String maskingChar;
   private OnOtpCompletionListener onOtpCompletionListener;
 
@@ -326,13 +326,13 @@ public class OtpView extends AppCompatEditText {
       }
       if (rtlTextDirection) {
         int reversedPosition = otpViewItemCount - i;
-        if (getText().length() >= reversedPosition) {
+        if (getText() != null && getText().length() >= reversedPosition) {
           drawInput(canvas, i);
         } else if (!TextUtils.isEmpty(getHint()) && getHint().length() == otpViewItemCount) {
           drawHint(canvas, i);
         }
       } else {
-        if (getText().length() > i) {
+        if (getText() != null && getText().length() > i) {
           drawInput(canvas, i);
         } else if (!TextUtils.isEmpty(getHint()) && getHint().length() == otpViewItemCount) {
           drawHint(canvas, i);
@@ -908,7 +908,7 @@ public class OtpView extends AppCompatEditText {
    * @param background The Drawable to use as the item background, or null to remove the
    * item background
    */
-  public void setItemBackground(Drawable background) {
+  private void setItemBackground(Drawable background) {
     itemBackgroundResource = 0;
     itemBackground = background;
     invalidate();

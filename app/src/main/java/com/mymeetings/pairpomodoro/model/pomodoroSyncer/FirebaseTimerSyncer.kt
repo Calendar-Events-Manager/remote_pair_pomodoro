@@ -101,9 +101,6 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
     private fun getSyncDBReference(sharingKey: String) =
         Firebase.database.getReference(ROOT_REF_KEY).child(sharingKey).child(SYNC_REF_KEY)
 
-    private fun getMasterDbReference(sharingKey: String) =
-        Firebase.database.getReference(ROOT_REF_KEY).child(sharingKey)
-
     companion object {
 
         private const val ROOT_REF_KEY = "timer"

@@ -12,8 +12,6 @@ import androidx.preference.PreferenceManager
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.pomodoroAlarm.AndroidTimerAlarm
-import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarmType
 import com.mymeetings.pairpomodoro.service.ActivityMessenger
 import com.mymeetings.pairpomodoro.service.PomodoroService
 import com.mymeetings.pairpomodoro.utils.Utils
