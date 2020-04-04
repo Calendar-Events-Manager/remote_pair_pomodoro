@@ -1,6 +1,10 @@
 package com.mymeetings.pairpomodoro.view
 
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Messenger
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -10,14 +14,17 @@ import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomoState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.utils.Utils
+import com.mymeetings.pairpomodoro.view.messenger.PomoMessenger
 import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
 import com.mymeetings.pairpomodoro.viewmodel.PomodoroViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ServiceConnection {
 
     private lateinit var pomodoroViewModel: PomodoroViewModel
+
+    private val pomoMessenger = PomoMessenger()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,5 +157,13 @@ class MainActivity : AppCompatActivity() {
         selectionLayout.visible()
         timerLayout.gone()
         container.keepScreenOn = false
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        pomoMessenger.onDisconnect()
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        pomoMessenger.onConnect(Messenger(service))
     }
 }

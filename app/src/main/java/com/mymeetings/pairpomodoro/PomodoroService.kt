@@ -3,8 +3,7 @@ package com.mymeetings.pairpomodoro
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.IBinder
-import android.os.PowerManager
+import android.os.*
 import android.os.PowerManager.PARTIAL_WAKE_LOCK
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -24,6 +23,8 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
     private lateinit var timerAlarm: TimerAlarm
     private lateinit var timerPreference: TimerPreference
     private lateinit var wakeLock: PowerManager.WakeLock
+    private var replyMessenger : Messenger? = null
+    private val recieveMessenger = Messenger(PomoHandler())
 
     override fun onCreate() {
         super.onCreate()
@@ -39,7 +40,7 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null
+        return recieveMessenger.binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -125,6 +126,16 @@ class PomodoroService : Service(), Observer<PomodoroStatus> {
 
     private fun checkAndUpdateNotification(pomodoroStatus: PomodoroStatus?) {
         NotificationUtils.showRunningNotification(this, pomodoroStatus)
+    }
+
+    inner class PomoHandler : Handler() {
+
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+
+            val data = msg.data
+
+        }
     }
 
     companion object {
