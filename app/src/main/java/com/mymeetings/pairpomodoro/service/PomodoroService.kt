@@ -126,6 +126,7 @@ class PomodoroService : Service() {
                 pomodoroManager.reset()
             }
             MessengerProtocol.COMMAND_CLOSE -> {
+                pomodoroStatus = null
                 pomodoroManager.close()
                 serviceMessenger.sendPomodoroStatus()
                 stopForeground()

@@ -1,11 +1,12 @@
 package com.mymeetings.pairpomodoro.model.pomodoroManager
 
+import com.google.firebase.database.PropertyName
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 
 data class PomoStatusWithKey(
-    val sign: String,
-    val pomodoroStatus: PomodoroStatus,
-    val updatedTime: Long
+    @PropertyName("sign") val sign: String,
+    @PropertyName("pomodoroStatus") val pomodoroStatus: PomodoroStatus,
+    @PropertyName("updatedTime") val updatedTime: Long
 ) {
     constructor() : this("", PomodoroStatus(), 0)
 

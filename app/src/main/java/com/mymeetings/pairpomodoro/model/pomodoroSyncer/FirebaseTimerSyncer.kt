@@ -18,7 +18,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
     private var statusCallback: ((PomodoroStatus) -> Unit)? = null
     private var keyNotFoundCallback: (() -> Unit)? = null
     private var sharingKey: String? = null
-    private val mySign: String = Utils.getRandomId()
+    private var mySign: String = Utils.getRandomId()
 
     override fun registerTimerUpdate(
         sharingKey: String,
@@ -30,6 +30,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
         this.createdCallback = createdCallback
         this.statusCallback = statusCallback
         this.keyNotFoundCallback = keyNotFoundCallback
+        this.mySign = Utils.getRandomId()
 
         getInfoDBReference(sharingKey).addValueEventListener(this)
     }
