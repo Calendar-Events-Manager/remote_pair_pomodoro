@@ -10,7 +10,7 @@ import android.os.Messenger
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.mymeetings.pairpomodoro.R
-import com.mymeetings.pairpomodoro.model.PomoState
+import com.mymeetings.pairpomodoro.model.PomodoroState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.service.ActivityMessenger
 import com.mymeetings.pairpomodoro.service.PomodoroService
@@ -122,27 +122,27 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
 
         sharingKeyText.text = sharingKey ?: ""
 
-        val mode = when (pomodoroStatus?.pomoState ?: PomoState.Focus) {
-            PomoState.Focus -> {
+        val mode = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
+            PomodoroState.Focus -> {
                 "Focus"
             }
-            PomoState.LongBreak -> {
+            PomodoroState.LongBreak -> {
                 "Long Break"
             }
-            PomoState.ShortBreak -> {
+            PomodoroState.ShortBreak -> {
                 "Short Break"
             }
         }
         modeText.text = mode
 
-        val startText = when (pomodoroStatus?.pomoState ?: PomoState.Focus) {
-            PomoState.Focus -> {
+        val startText = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
+            PomodoroState.Focus -> {
                 "Start Focus"
             }
-            PomoState.LongBreak -> {
+            PomodoroState.LongBreak -> {
                 "Take Long Break"
             }
-            PomoState.ShortBreak -> {
+            PomodoroState.ShortBreak -> {
                 "Take Short Break"
             }
         }

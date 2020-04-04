@@ -1,6 +1,6 @@
 package com.mymeetings.pairpomodoro.model.pomodoroManager
 
-import com.mymeetings.pairpomodoro.model.PomoState
+import com.mymeetings.pairpomodoro.model.PomodoroState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
@@ -21,7 +21,7 @@ class PomodoroManagerTest {
 
     @MockK
     private lateinit var timerAlarm: TimerAlarm
-    private val sharingKey = "ABCDE"
+    private val sharingKey = "SHARE"
     @RelaxedMockK
     private lateinit var timerPreference: TimerPreference
     @MockK
@@ -61,7 +61,7 @@ class PomodoroManagerTest {
         val syncFailedCallback = mockk<SyncFailedCallback>()
 
         val expectedStatus = PomodoroStatus(
-            pomoState = PomoState.Focus,
+            pomodoroState = PomodoroState.Focus,
             balanceTime = timerPreference.getFocusTime(),
             shortBreaksLeft = timerPreference.getShortBreakCount(),
             pause = false
@@ -135,7 +135,7 @@ class PomodoroManagerTest {
         pomodoroManager.start()
 
         val expectedStatus = PomodoroStatus(
-            pomoState = PomoState.Focus,
+            pomodoroState = PomodoroState.Focus,
             balanceTime = timerPreference.getFocusTime(),
             shortBreaksLeft = timerPreference.getShortBreakCount(),
             pause = false
@@ -154,7 +154,7 @@ class PomodoroManagerTest {
         pomodoroManager.pause()
 
         val expectedStatus = PomodoroStatus(
-            pomoState = PomoState.Focus,
+            pomodoroState = PomodoroState.Focus,
             balanceTime = timerPreference.getFocusTime(),
             shortBreaksLeft = timerPreference.getShortBreakCount(),
             pause = true
@@ -173,7 +173,7 @@ class PomodoroManagerTest {
         pomodoroManager.reset()
 
         val expectedStatus = PomodoroStatus(
-            pomoState = PomoState.Focus,
+            pomodoroState = PomodoroState.Focus,
             balanceTime = timerPreference.getFocusTime(),
             shortBreaksLeft = timerPreference.getShortBreakCount(),
             pause = true

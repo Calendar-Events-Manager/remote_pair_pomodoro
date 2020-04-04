@@ -23,7 +23,7 @@ class PomodoroService : Service() {
         PomodoroManager(
             AndroidTimerAlarm(this),
             FirebaseTimerSyncer(),
-            ::onPomoStatusUpdate
+            ::onPomodoroStatusUpdate
         )
     }
 
@@ -86,7 +86,7 @@ class PomodoroService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun onPomoStatusUpdate(pomodoroStatus: PomodoroStatus) {
+    private fun onPomodoroStatusUpdate(pomodoroStatus: PomodoroStatus) {
         if (this.pomodoroStatus?.pause != pomodoroStatus.pause) {
             checkAndUpdateNotification(pomodoroStatus)
             checkAndUpdateCPUWake(pomodoroStatus)

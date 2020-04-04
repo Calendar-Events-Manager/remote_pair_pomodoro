@@ -6,7 +6,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.pomodoroManager.PomoStatusWithKey
+import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroStatusWithKey
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.SyncableTimerPreference
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.toSyncableTimerPreference
@@ -57,7 +57,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
     override fun setTimerStatus(pomodoroStatus: PomodoroStatus) {
         sharingKey?.let {
             getSyncDBReference(it).setValue(
-                PomoStatusWithKey(
+                PomodoroStatusWithKey(
                     sign = mySign,
                     pomodoroStatus = pomodoroStatus,
                     updatedTime = System.currentTimeMillis()
@@ -87,9 +87,9 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
                 keyNotFoundCallback?.invoke()
             }
         } else if (datasnapshot.key == SYNC_REF_KEY) {
-            datasnapshot.getValue(PomoStatusWithKey::class.java)?.let { pomoStatusWithKey ->
-                if (pomoStatusWithKey.sign != mySign) {
-                    statusCallback?.invoke(pomoStatusWithKey.reCorrectedPomoStatus(System.currentTimeMillis()))
+            datasnapshot.getValue(PomodoroStatusWithKey::class.java)?.let { pomodoroStatusWithKey ->
+                if (pomodoroStatusWithKey.sign != mySign) {
+                    statusCallback?.invoke(pomodoroStatusWithKey.reCorrectedPomodoroStatus(System.currentTimeMillis()))
                 }
             }
         }

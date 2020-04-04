@@ -10,7 +10,7 @@ class ActivityMessenger(
 ) {
 
     private var sendingMessenger: Messenger? = null
-    private val recievingMessenger = Messenger(ReplyHandler(statusCallback, keyNotFoundCallback))
+    private val receivingMessenger = Messenger(ReplyHandler(statusCallback, keyNotFoundCallback))
 
     fun onConnect(messenger: Messenger) {
         this.sendingMessenger = messenger
@@ -59,7 +59,7 @@ class ActivityMessenger(
         bundle.putString(MessengerProtocol.SYNC_KEY, sharingKey)
 
         msg.data = bundle
-        msg.replyTo = recievingMessenger
+        msg.replyTo = receivingMessenger
 
         try {
             sendingMessenger?.send(msg)

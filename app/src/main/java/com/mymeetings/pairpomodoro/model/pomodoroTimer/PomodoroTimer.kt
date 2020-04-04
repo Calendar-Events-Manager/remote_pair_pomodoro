@@ -1,6 +1,6 @@
 package com.mymeetings.pairpomodoro.model.pomodoroTimer
 
-import com.mymeetings.pairpomodoro.model.PomoState
+import com.mymeetings.pairpomodoro.model.PomodoroState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.TimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.toTimerAlarmType
@@ -13,7 +13,7 @@ class PomodoroTimer(
     private val timerUpdater: TimerUpdater
 ) : Ticker {
 
-    private var pomoState: PomoState = PomoState.Focus
+    private var pomodoroState: PomodoroState = PomodoroState.Focus
     private var balanceTime: Long = timerPreference.getFocusTime()
     private var shortBreaksLeft: Int = timerPreference.getShortBreakCount()
     private var pause: Boolean = true
@@ -33,7 +33,7 @@ class PomodoroTimer(
     fun reset() {
         pause = true
         tickerRunner.cancel()
-        pomoState = PomoState.Focus
+        pomodoroState = PomodoroState.Focus
         balanceTime = timerPreference.getFocusTime()
         shortBreaksLeft = timerPreference.getShortBreakCount()
         updateTimerInfo(true)
@@ -45,7 +45,7 @@ class PomodoroTimer(
 
     fun sync(pomodoroStatus: PomodoroStatus) {
         this.balanceTime = pomodoroStatus.balanceTime
-        this.pomoState = pomodoroStatus.pomoState
+        this.pomodoroState = pomodoroStatus.pomodoroState
         this.shortBreaksLeft = pomodoroStatus.shortBreaksLeft
         this.pause = pomodoroStatus.pause
         if (pomodoroStatus.pause) {
@@ -60,8 +60,8 @@ class PomodoroTimer(
         balanceTime -= elapsedTime
 
         if (isTimerOver()) {
-            pomoState = nextPomoState()
-            sendAlarmForNextPomoState()
+            pomodoroState = nextPomodoroState()
+            sendAlarmForNextPomodoroState()
             pause()
         } else {
             updateTimerInfo(false)
@@ -70,37 +70,37 @@ class PomodoroTimer(
 
     private fun isTimerOver() = balanceTime <= 0
 
-    private fun sendAlarmForNextPomoState() {
-        timerAlarm.alarm(pomoState.toTimerAlarmType())
+    private fun sendAlarmForNextPomodoroState() {
+        timerAlarm.alarm(pomodoroState.toTimerAlarmType())
     }
 
-    private fun nextPomoState() =
-        when (pomoState) {
-            PomoState.Focus -> {
+    private fun nextPomodoroState() =
+        when (pomodoroState) {
+            PomodoroState.Focus -> {
                 if (shortBreaksLeft > 0) {
                     shortBreaksLeft -= 1
                     balanceTime = timerPreference.getShortBreakTime()
-                    PomoState.ShortBreak
+                    PomodoroState.ShortBreak
                 } else {
                     balanceTime = timerPreference.getLongBreakTime()
                     shortBreaksLeft = timerPreference.getShortBreakCount()
-                    PomoState.LongBreak
+                    PomodoroState.LongBreak
                 }
             }
-            PomoState.ShortBreak -> {
+            PomodoroState.ShortBreak -> {
                 balanceTime = timerPreference.getFocusTime()
-                PomoState.Focus
+                PomodoroState.Focus
             }
-            PomoState.LongBreak -> {
+            PomodoroState.LongBreak -> {
                 balanceTime = timerPreference.getFocusTime()
-                PomoState.Focus
+                PomodoroState.Focus
             }
         }
 
     private fun updateTimerInfo(actionChanges: Boolean) =
         timerUpdater.update(
             pomodoroStatus = PomodoroStatus(
-                pomoState = pomoState,
+                pomodoroState = pomodoroState,
                 balanceTime = balanceTime,
                 shortBreaksLeft = shortBreaksLeft,
                 pause = pause

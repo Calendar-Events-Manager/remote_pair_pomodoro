@@ -1,19 +1,3 @@
-/*
- * Copyright 2018 Mukesh Solanki
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.mymeetings.pairpomodoro.view.custom;
 
 import android.animation.ValueAnimator;
@@ -153,9 +137,7 @@ public class OtpView extends AppCompatEditText {
   @Override
   public void setTypeface(Typeface tf) {
     super.setTypeface(tf);
-    if (animatorTextPaint != null) {
-      animatorTextPaint.set(getPaint());
-    }
+    animatorTextPaint.set(getPaint());
   }
 
   private void setMaxLength(int maxLength) {
@@ -666,7 +648,6 @@ public class OtpView extends AppCompatEditText {
    * @param color A color value in the form 0xAARRGGBB.
    * Do not pass a resource ID. To get a color value from a resource ID, call
    * {@link androidx.core.content.ContextCompat#getColor(Context, int) getColor}.
-   * @attr ref R.styleable#OtpView_lineColor
    * @see #setLineColor(ColorStateList)
    * @see #getLineColors()
    */
@@ -678,7 +659,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the line color.
    *
-   * @attr ref R.styleable#OtpView_lineColor
    * @see #setLineColor(int)
    * @see #getLineColors()
    */
@@ -694,7 +674,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Gets the line colors for the different states (normal, selected, focused) of the OtpView.
    *
-   * @attr ref R.styleable#OtpView_lineColor
    * @see #setLineColor(ColorStateList)
    * @see #setLineColor(int)
    */
@@ -715,7 +694,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the line width.
    *
-   * @attr ref R.styleable#OtpView_lineWidth
    * @see #getLineWidth()
    */
   public void setLineWidth(@Px int borderWidth) {
@@ -735,7 +713,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the count of items.
    *
-   * @attr ref R.styleable#OtpView_itemCount
    * @see #getItemCount()
    */
   public void setItemCount(int count) {
@@ -755,7 +732,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the radius of square.
    *
-   * @attr ref R.styleable#OtpView_itemRadius
    * @see #getItemRadius()
    */
   public void setItemRadius(@Px int itemRadius) {
@@ -775,7 +751,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Specifies extra space between two items.
    *
-   * @attr ref R.styleable#OtpView_itemSpacing
    * @see #getItemSpacing()
    */
   public void setItemSpacing(@Px int itemSpacing) {
@@ -795,7 +770,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the height of item.
    *
-   * @attr ref R.styleable#OtpView_itemHeight
    * @see #getItemHeight()
    */
   public void setItemHeight(@Px int itemHeight) {
@@ -815,7 +789,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the width of item.
    *
-   * @attr ref R.styleable#OtpView_itemWidth
    * @see #getItemWidth()
    */
   public void setItemWidth(@Px int itemWidth) {
@@ -848,7 +821,6 @@ public class OtpView extends AppCompatEditText {
    *
    * @param hideLineWhenFilled true to hide line on a position where text entered,
    * false to always show line
-   * @attr ref R.styleable#OtpView_hideLineWhenFilled
    */
   public void setHideLineWhenFilled(boolean hideLineWhenFilled) {
     this.hideLineWhenFilled = hideLineWhenFilled;
@@ -877,7 +849,6 @@ public class OtpView extends AppCompatEditText {
    * a Drawable object or 0 to remove the item background.
    *
    * @param resId The identifier of the resource.
-   * @attr ref R.styleable#OtpView_android_itemBackground
    */
   public void setItemBackgroundResources(@DrawableRes int resId) {
     if (resId != 0 && itemBackgroundResource != resId) {
@@ -920,7 +891,6 @@ public class OtpView extends AppCompatEditText {
   /**
    * Sets the width (in pixels) of cursor.
    *
-   * @attr ref R.styleable#OtpView_cursorWidth
    * @see #getCursorWidth()
    */
   public void setCursorWidth(@Px int width) {
@@ -944,7 +914,6 @@ public class OtpView extends AppCompatEditText {
    * @param color A color value in the form 0xAARRGGBB.
    * Do not pass a resource ID. To get a color value from a resource ID, call
    * {@link androidx.core.content.ContextCompat#getColor(Context, int) getColor}.
-   * @attr ref R.styleable#OtpView_cursorColor
    * @see #getCursorColor()
    */
   public void setCursorColor(@ColorInt int color) {

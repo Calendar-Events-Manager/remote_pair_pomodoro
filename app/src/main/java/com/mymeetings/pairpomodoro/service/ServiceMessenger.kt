@@ -10,11 +10,11 @@ class ServiceMessenger(
 ) {
 
     private var sendingMessenger: Messenger? = null
-    private val recievingMessenger = Messenger(ReplyHandler(commandCallback, { messenger ->
+    private val receivingMessenger = Messenger(ReplyHandler(commandCallback, { messenger ->
         sendingMessenger = messenger
     }))
 
-    fun getBinder(): IBinder = recievingMessenger.binder
+    fun getBinder(): IBinder = receivingMessenger.binder
 
     fun sendPomodoroStatus(
         sharingKey: String? = null,
@@ -27,7 +27,7 @@ class ServiceMessenger(
     }
 
     /**
-     * sharingKey is optional and should be only sent for pomostatus.
+     * sharingKey is optional and should be only sent for pomodoro status.
      */
     private fun sendMessage(@Reply reply: Int, sharingKey: String? = null, pomodoroStatus: PomodoroStatus? = null) {
         val msg = Message.obtain()
@@ -38,7 +38,7 @@ class ServiceMessenger(
         bundle.putParcelable(MessengerProtocol.STATUS_KEY, pomodoroStatus)
 
         msg.data = bundle
-        msg.replyTo = recievingMessenger
+        msg.replyTo = receivingMessenger
 
         try {
             sendingMessenger?.send(msg)
@@ -49,14 +49,14 @@ class ServiceMessenger(
 
     internal class ReplyHandler(
         private val commandCallback: ((@Command Int, sharingKey: String?) -> Unit),
-        private val replyRecieverCallback: ((replyMessenger: Messenger?) -> Unit)
+        private val replyReceiverCallback: ((replyMessenger: Messenger?) -> Unit)
     ) : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 
             val command = msg.data?.getInt(MessengerProtocol.COMMAND_TYPE_KEY)
             val sharingKey = msg.data?.getString(MessengerProtocol.SYNC_KEY)
-            replyRecieverCallback.invoke(msg.replyTo)
+            replyReceiverCallback.invoke(msg.replyTo)
 
             command?.let {
                 commandCallback(command, sharingKey)

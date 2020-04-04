@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class PomodoroStatus(
-    @PropertyName("pomoState") val pomoState: PomoState = PomoState.Focus,
+    @PropertyName("pomoState") val pomodoroState: PomodoroState = PomodoroState.Focus,
     @PropertyName("balanceTime") val balanceTime: Long = 0,
     @PropertyName("shortBreaksLeft") val shortBreaksLeft: Int = 0,
     @PropertyName("pause") val pause: Boolean = false

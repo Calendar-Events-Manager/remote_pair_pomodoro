@@ -1,6 +1,6 @@
 package com.mymeetings.pairpomodoro.model.pomodoroAlarm
 
-import com.mymeetings.pairpomodoro.model.PomoState
+import com.mymeetings.pairpomodoro.model.PomodoroState
 
 interface TimerAlarm {
 
@@ -8,10 +8,10 @@ interface TimerAlarm {
 }
 
 
-fun PomoState.toTimerAlarmType(): TimerAlarmType {
+fun PomodoroState.toTimerAlarmType(): TimerAlarmType {
     return when(this) {
-        PomoState.LongBreak -> TimerAlarmType.LongBreak
-        PomoState.Focus -> TimerAlarmType.Focus
-        PomoState.ShortBreak -> TimerAlarmType.ShortBreak
+        PomodoroState.LongBreak -> TimerAlarmType.LongBreak
+        PomodoroState.Focus -> TimerAlarmType.Focus
+        PomodoroState.ShortBreak -> TimerAlarmType.ShortBreak
     }
 }

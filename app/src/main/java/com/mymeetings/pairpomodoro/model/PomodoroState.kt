@@ -1,6 +1,6 @@
 package com.mymeetings.pairpomodoro.model
 
-enum class PomoState {
+enum class PomodoroState {
     Focus,
     ShortBreak,
     LongBreak
