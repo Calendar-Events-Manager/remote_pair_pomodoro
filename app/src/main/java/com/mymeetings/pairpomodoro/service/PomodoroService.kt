@@ -3,8 +3,6 @@ package com.mymeetings.pairpomodoro.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.PowerManager.PARTIAL_WAKE_LOCK
@@ -18,9 +16,9 @@ import com.mymeetings.pairpomodoro.view.NotificationUtils
 class PomodoroService : Service() {
 
     private var pomodoroStatus: PomodoroStatus? = null
-
-    private lateinit var wakeLock: PowerManager.WakeLock
+    private var isForeGround: Boolean = false
     private val serviceMessenger = ServiceMessenger(::onCommandReceived)
+
     private val pomodoroManager by lazy {
         PomodoroManager(
             AndroidTimerAlarm(this),
@@ -29,13 +27,24 @@ class PomodoroService : Service() {
         )
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
+    private val wakeLock by lazy {
+        (getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
             PARTIAL_WAKE_LOCK,
             packageName
         )
+    }
+
+    private fun startForeGround() {
+        isForeGround = true
+        startForeground(
+            NotificationUtils.POMODORO_NOTIFICATION_ID,
+            NotificationUtils.getPomodoroNotification(this, pomodoroStatus)
+        )
+    }
+
+    private fun stopForeground() {
+        isForeGround = false
+        stopForeground(true)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -45,18 +54,14 @@ class PomodoroService : Service() {
 
     override fun onRebind(intent: Intent?) {
         super.onRebind(intent)
-        stopForeground(true)
+        stopForeground()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
         if (pomodoroManager.isRunning()) {
-            startForeground(
-                NotificationUtils.POMODORO_NOTIFICATION_ID,
-                NotificationUtils.getPomodoroNotification(this),
-                FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-            )
+            startForeGround()
         } else {
-            stopForeground(false)
+            stopForeground()
         }
 
         return true
@@ -66,8 +71,8 @@ class PomodoroService : Service() {
 
         val timerType = intent?.getIntExtra(
             TIMER_TYPE_KEY,
-            TIMER_TYPE_START
-        ) ?: TIMER_TYPE_START
+            -1
+        ) ?: -1
 
         when (timerType) {
             TIMER_TYPE_START -> {
@@ -78,22 +83,16 @@ class PomodoroService : Service() {
             }
         }
 
-        startForeground(
-            NotificationUtils.POMODORO_NOTIFICATION_ID,
-            NotificationUtils.getPomodoroNotification(this),
-            FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-        )
-
         return START_NOT_STICKY
     }
 
     private fun onPomoStatusUpdate(pomodoroStatus: PomodoroStatus) {
-        serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
         if (this.pomodoroStatus?.pause != pomodoroStatus.pause) {
             checkAndUpdateNotification(pomodoroStatus)
             checkAndUpdateCPUWake(pomodoroStatus)
-            this.pomodoroStatus = pomodoroStatus
         }
+        this.pomodoroStatus = pomodoroStatus
+        serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
     }
 
     private fun onSharingFailed() {
@@ -102,6 +101,9 @@ class PomodoroService : Service() {
 
     private fun onCommandReceived(@MessengerProtocol.Command command: Int, sharingKey: String? = null) {
         when (command) {
+            MessengerProtocol.COMMAND_HANDSHAKE -> {
+                serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
+            }
             MessengerProtocol.COMMAND_CREATE -> {
                 pomodoroManager.create(UserTimerPreference(this))
                 pomodoroManager.start()
@@ -126,7 +128,7 @@ class PomodoroService : Service() {
             MessengerProtocol.COMMAND_CLOSE -> {
                 pomodoroManager.close()
                 serviceMessenger.sendPomodoroStatus()
-                stopForeground(true)
+                stopForeground()
             }
         }
     }
@@ -151,7 +153,7 @@ class PomodoroService : Service() {
 
 
     private fun checkAndUpdateNotification(pomodoroStatus: PomodoroStatus?) {
-        if (foregroundServiceType != FOREGROUND_SERVICE_TYPE_NONE) {
+        if (isForeGround) {
             NotificationUtils.showRunningNotification(this, pomodoroStatus)
         }
     }

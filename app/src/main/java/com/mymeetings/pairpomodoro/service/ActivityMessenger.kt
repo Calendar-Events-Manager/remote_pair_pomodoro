@@ -44,6 +44,10 @@ class ActivityMessenger(
         sendMessage(MessengerProtocol.COMMAND_CLOSE)
     }
 
+    fun handShake() {
+        sendMessage(MessengerProtocol.COMMAND_HANDSHAKE)
+    }
+
     /**
      * sharingKey is optional and should be only sent for syncPomodoro.
      */

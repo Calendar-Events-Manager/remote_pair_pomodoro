@@ -14,10 +14,9 @@ class PomodoroManager(
     private val timerAlarm: TimerAlarm,
     private val timerSyncer: TimerSyncer,
     private val updateCallback: ((pomodoroStatus: PomodoroStatus) -> Unit)
-    ) : TimerUpdater {
+) : TimerUpdater {
 
-    private lateinit var pomodoroTimer: PomodoroTimer
-    private var isRunning = false
+    private var pomodoroTimer: PomodoroTimer? = null
 
     fun sync(
         shareKey: String,
@@ -50,24 +49,23 @@ class PomodoroManager(
     fun getShareKey() = timerSyncer.getSharingKey()
 
     fun start() {
-        isRunning = true
-        pomodoroTimer.start()
+        pomodoroTimer?.start()
     }
 
     fun pause() {
-        pomodoroTimer.pause()
+        pomodoroTimer?.pause()
     }
 
-    fun isRunning() = isRunning
+    fun isRunning() = pomodoroTimer != null
 
     fun reset() {
-        pomodoroTimer.reset()
+        pomodoroTimer?.reset()
     }
 
     fun close() {
-        isRunning = false
         timerSyncer.unregisterTimerUpdate()
-        pomodoroTimer.close()
+        pomodoroTimer?.close()
+        pomodoroTimer = null
     }
 
     override fun update(pomodoroStatus: PomodoroStatus, actionChanges: Boolean) {
@@ -87,6 +85,6 @@ class PomodoroManager(
     }
 
     private fun onTimerSyncUpdate(pomodoroStatus: PomodoroStatus) {
-        pomodoroTimer.sync(pomodoroStatus)
+        pomodoroTimer?.sync(pomodoroStatus)
     }
 }

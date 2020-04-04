@@ -71,6 +71,8 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         }
 
         showSelectionView()
+
+        startService(Intent(this, PomodoroService::class.java))
     }
 
     private fun showStatus(pomodoroStatus: PomodoroStatus?, sharingKey: String?) {
@@ -173,5 +175,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         activityMessenger.onConnect(Messenger(service))
+        activityMessenger.handShake()
     }
 }
