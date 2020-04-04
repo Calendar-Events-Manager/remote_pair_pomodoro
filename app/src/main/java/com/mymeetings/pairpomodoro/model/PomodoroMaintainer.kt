@@ -74,4 +74,8 @@ class PomodoroMaintainer {
         syncFailedEvent.value = Unit
     }
 
+    fun isRunning() {
+
+    }
+
 }

@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         syncButton.setOnClickListener {
             ViewUtils.buildInputDialog(this) {
                 activityMessenger.syncPomodoro(it)
-                showTimerView(null)
+                showTimerView()
             }
         }
 
@@ -73,9 +73,9 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         showSelectionView()
     }
 
-    private fun showStatus(pomodoroStatus: PomodoroStatus?) {
+    private fun showStatus(pomodoroStatus: PomodoroStatus?, sharingKey: String?) {
         if (pomodoroStatus != null) {
-            showTimerView(pomodoroStatus)
+            showTimerView(pomodoroStatus, sharingKey)
         } else {
             showSelectionView()
         }
@@ -87,7 +87,10 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
-    private fun showTimerView(pomodoroStatus: PomodoroStatus?) {
+    private fun showTimerView(
+        pomodoroStatus: PomodoroStatus? = null,
+        sharingKey: String? = null
+    ) {
 
         timerLayout.visible()
         selectionLayout.gone()
@@ -115,7 +118,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
             }
         }
 
-        //sharingKeyText.text = pomodoroViewModel.sharingKey
+        sharingKeyText.text = sharingKey ?: ""
 
         val mode = when (pomodoroStatus?.pomoState ?: PomoState.Focus) {
             PomoState.Focus -> {

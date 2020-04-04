@@ -43,6 +43,8 @@ class PomodoroTimer(
         tickerRunner.cancel()
     }
 
+    fun isRunning() = !pause
+
     fun sync(pomodoroStatus: PomodoroStatus) {
         this.balanceTime = pomodoroStatus.balanceTime
         this.pomoState = pomodoroStatus.pomoState

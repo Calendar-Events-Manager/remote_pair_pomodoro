@@ -26,7 +26,8 @@
 
         <service
             android:name=".service.PomodoroService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

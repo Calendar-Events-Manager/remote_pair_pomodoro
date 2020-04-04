@@ -14,9 +14,11 @@ class ServiceMessenger(
         sendingMessenger = messenger
     }))
 
-    fun getBinder() = recievingMessenger.binder
+    fun getBinder(): IBinder = recievingMessenger.binder
 
-    fun sendPomodoroStatus(sharingKey: String, pomodoroStatus: PomodoroStatus?) {
+    fun sendPomodoroStatus(
+        sharingKey: String? = null,
+        pomodoroStatus: PomodoroStatus? = null) {
         sendMessage(MessengerProtocol.REPLY_STATUS, sharingKey, pomodoroStatus)
     }
 

@@ -14,11 +14,11 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 
 object NotificationUtils {
 
-    private const val FOREGROUND_CHANNEL_ID = "pomodoro_timer"
+    private const val FOREGROUND_CHANNEL_ID = "Pomodoro Running Timer"
     private const val REQ_CODE_OPEN_ACTIVITY = 1
     private const val REQ_CODE_START_TIMER = 2
     private const val REQ_CODE_PAUSE_TIMER = 3
-    const val POMODORO_NOTIFICATION_ID = 12
+    const val POMODORO_NOTIFICATION_ID = 1
 
     private fun checkAndCreateChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

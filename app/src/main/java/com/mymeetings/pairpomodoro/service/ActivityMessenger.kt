@@ -5,11 +5,11 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Command
 
 class ActivityMessenger(
-    statusCallback : (pomodoroStatus : PomodoroStatus?) -> Unit,
-    keyNotFoundCallback : (() -> Unit)
+    statusCallback: (pomodoroStatus: PomodoroStatus?, sharingKey: String?) -> Unit,
+    keyNotFoundCallback: (() -> Unit)
 ) {
 
-    private var sendingMessenger : Messenger? = null
+    private var sendingMessenger: Messenger? = null
     private val recievingMessenger = Messenger(ReplyHandler(statusCallback, keyNotFoundCallback))
 
     fun onConnect(messenger: Messenger) {
@@ -24,7 +24,7 @@ class ActivityMessenger(
         sendMessage(MessengerProtocol.COMMAND_CREATE)
     }
 
-    fun syncPomodoro(sharingKey : String) {
+    fun syncPomodoro(sharingKey: String) {
         sendMessage(MessengerProtocol.COMMAND_SYNC, sharingKey)
     }
 
@@ -47,7 +47,7 @@ class ActivityMessenger(
     /**
      * sharingKey is optional and should be only sent for syncPomodoro.
      */
-    private fun sendMessage(@Command command : Int, sharingKey : String? = null) {
+    private fun sendMessage(@Command command: Int, sharingKey: String? = null) {
         val msg = Message.obtain()
 
         val bundle = Bundle()
@@ -65,21 +65,23 @@ class ActivityMessenger(
     }
 
     internal class ReplyHandler(
-        private val statusCallback : (pomodoroStatus : PomodoroStatus?) -> Unit,
-        private val keyNotFoundCallback : (() -> Unit)
+        private val statusCallback: (pomodoroStatus: PomodoroStatus?, sharingKey: String?) -> Unit,
+        private val keyNotFoundCallback: (() -> Unit)
     ) : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 
             val reply = msg.data?.getInt(MessengerProtocol.REPLY_KEY)
 
-            when(reply) {
+            when (reply) {
                 MessengerProtocol.REPLY_STATUS -> {
-                    val pomodoroStatus = msg.data?.getParcelable<PomodoroStatus>(MessengerProtocol.STATUS_KEY)
-                    statusCallback.invoke(pomodoroStatus)
+                    val pomodoroStatus =
+                        msg.data?.getParcelable<PomodoroStatus>(MessengerProtocol.STATUS_KEY)
+                    val sharingKey = msg.data?.getString(MessengerProtocol.SYNC_KEY)
+                    statusCallback.invoke(pomodoroStatus, sharingKey)
                 }
                 MessengerProtocol.REPLY_NOT_FOUND -> {
-                   keyNotFoundCallback.invoke()
+                    keyNotFoundCallback.invoke()
                 }
             }
         }
