@@ -32,7 +32,7 @@ class TickerRunnerTest {
     @Test
     fun `cancel should prevent calling tick for each second`() = runBlocking {
         tickerRunner.run(ticker)
-        delay(1000)
+        delay(1100)
         tickerRunner.cancel()
         delay(1000)
 
