@@ -81,6 +81,9 @@ class PomodoroService : Service() {
             TIMER_TYPE_PAUSE -> {
                 pomodoroManager.pause()
             }
+            TIMER_TYPE_EXIT -> {
+                closePomodoroTimer()
+            }
         }
 
         return START_NOT_STICKY
@@ -126,12 +129,16 @@ class PomodoroService : Service() {
                 pomodoroManager.reset()
             }
             MessengerProtocol.COMMAND_CLOSE -> {
-                pomodoroStatus = null
-                pomodoroManager.close()
-                serviceMessenger.sendPomodoroStatus()
-                stopForeground()
+                closePomodoroTimer()
             }
         }
+    }
+
+    private fun closePomodoroTimer() {
+        pomodoroStatus = null
+        pomodoroManager.close()
+        serviceMessenger.sendPomodoroStatus()
+        stopForeground()
     }
 
     override fun onDestroy() {
@@ -163,6 +170,7 @@ class PomodoroService : Service() {
         private const val TIMER_TYPE_KEY = "timer_type"
         private const val TIMER_TYPE_PAUSE = 4
         private const val TIMER_TYPE_START = 5
+        private const val TIMER_TYPE_EXIT = 6
 
         fun getStartPomodoroIntent(context: Context) =
             Intent(context, PomodoroService::class.java).apply {
@@ -177,6 +185,14 @@ class PomodoroService : Service() {
                 putExtra(
                     TIMER_TYPE_KEY,
                     TIMER_TYPE_PAUSE
+                )
+            }
+
+        fun getExitPomodoroIntent(context: Context) =
+            Intent(context, PomodoroService::class.java).apply {
+                putExtra(
+                    TIMER_TYPE_KEY,
+                    TIMER_TYPE_EXIT
                 )
             }
 

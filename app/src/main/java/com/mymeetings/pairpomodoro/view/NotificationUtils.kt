@@ -18,6 +18,7 @@ object NotificationUtils {
     private const val REQ_CODE_OPEN_ACTIVITY = 1
     private const val REQ_CODE_START_TIMER = 2
     private const val REQ_CODE_PAUSE_TIMER = 3
+    private const val REQ_CODE_EXIT_TIMER = 4
     const val POMODORO_NOTIFICATION_ID = 1
 
     private fun checkAndCreateChannel(context: Context) {
@@ -67,7 +68,7 @@ object NotificationUtils {
             }
             pomodoroStatus.pause -> {
 
-                val actionPendingIntent: PendingIntent = PendingIntent.getService(
+                val startActionPendingIntent: PendingIntent = PendingIntent.getService(
                     context,
                     REQ_CODE_START_TIMER,
                     PomodoroService.getStartPomodoroIntent(context),
@@ -77,7 +78,7 @@ object NotificationUtils {
                 val startAction = NotificationCompat.Action(
                     R.drawable.ic_play_arrow_white_24dp,
                     context.getString(R.string.start),
-                    actionPendingIntent
+                    startActionPendingIntent
                 )
 
                 notificationBuilder
@@ -106,6 +107,21 @@ object NotificationUtils {
                     .setContentText(context.getString(R.string.started))
             }
         }
+
+        val exitActionPendingIntent: PendingIntent = PendingIntent.getService(
+            context,
+            REQ_CODE_EXIT_TIMER,
+            PomodoroService.getExitPomodoroIntent(context),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val exitAction = NotificationCompat.Action(
+            R.drawable.ic_exit_white_24dp,
+            context.getString(R.string.exit),
+            exitActionPendingIntent
+        )
+
+        notificationBuilder.addAction(exitAction)
 
         return notificationBuilder.build()
     }
