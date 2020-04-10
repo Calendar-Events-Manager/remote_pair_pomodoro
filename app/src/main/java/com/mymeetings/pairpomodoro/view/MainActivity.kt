@@ -12,16 +12,23 @@ import androidx.preference.PreferenceManager
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomodoroState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder.Companion.FOCUS_TIME_KEY
 import com.mymeetings.pairpomodoro.service.ActivityMessenger
 import com.mymeetings.pairpomodoro.service.PomodoroService
 import com.mymeetings.pairpomodoro.utils.Utils
 import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity(), ServiceConnection {
 
-    private val activityMessenger = ActivityMessenger(::showStatus, ::keyNotFound)
+    private val activityMessenger = ActivityMessenger(
+        ::onTimerCreated,
+        ::onStatusUpdated,
+        ::onKeyNotFound
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,29 +82,36 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         startService(Intent(this, PomodoroService::class.java))
     }
 
-    private fun showStatus(pomodoroStatus: PomodoroStatus?, sharingKey: String?) {
+    private fun onStatusUpdated(pomodoroStatus: PomodoroStatus?) {
         if (pomodoroStatus != null) {
-            showTimerView(pomodoroStatus, sharingKey)
+            showTimerView(pomodoroStatus)
         } else {
             showSelectionView()
         }
     }
 
-    private fun keyNotFound() {
+    private fun onTimerCreated(
+        timerPreference: TimerPreference,
+        sharingKey: String
+    ) {
+        timerProgressBar.max = timerPreference.getFocusTime().toInt()
+        sharingKeyText.text = sharingKey
+    }
+
+    private fun onKeyNotFound() {
         ViewUtils.infoDialog(this, "Timer not available for this key") {
             activityMessenger.closePomodoro()
         }
     }
 
-    private fun showTimerView(
-        pomodoroStatus: PomodoroStatus? = null,
-        sharingKey: String? = null
-    ) {
+    private fun showTimerView(pomodoroStatus: PomodoroStatus? = null) {
 
         timerLayout.visible()
         selectionLayout.gone()
 
-        countDownView.text = Utils.getDurationBreakdown(pomodoroStatus?.balanceTime ?: 0)
+        val balanceTime = pomodoroStatus?.balanceTime ?: 0
+        countDownView.text = Utils.getDurationBreakdown(balanceTime)
+        timerProgressBar.progress = balanceTime.toInt()
 
         when {
             pomodoroStatus == null -> {
@@ -119,8 +133,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
                 pausedText.gone()
             }
         }
-
-        sharingKeyText.text = sharingKey ?: ""
 
         val mode = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
             PomodoroState.Focus -> {
@@ -158,6 +170,14 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         bindService(Intent(this, PomodoroService::class.java), this, Context.BIND_AUTO_CREATE)
     }
 
+    override fun onResume() {
+        super.onResume()
+        timerProgressBar.max =
+            TimeUnit.MINUTES.toMillis(
+                PreferenceManager.getDefaultSharedPreferences(this).getInt(FOCUS_TIME_KEY, 25).toLong()
+            ).toInt()
+    }
+
     override fun onStop() {
         super.onStop()
         unbindService(this)
@@ -176,5 +196,10 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         activityMessenger.onConnect(Messenger(service))
         activityMessenger.handShake()
+    }
+
+    companion object {
+        private const val TIMER_PROGRESS_BAR_MAX = "TIMER_PROGRESS_BAR_MAX"
+        private const val TIMER_PROGRESS_BAR_PROGRESS = "TIMER_PROGRESS_BAR_PROGRESS"
     }
 }

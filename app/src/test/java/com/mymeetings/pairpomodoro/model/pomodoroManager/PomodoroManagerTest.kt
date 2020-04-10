@@ -11,7 +11,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import org.junit.Before
 import org.junit.Test
 
-typealias CreationCallback = (TimerPreference) -> Unit
+typealias CreationCallback = (TimerPreference, String) -> Unit
 typealias UpdateCallback = (PomodoroStatus) -> Unit
 typealias SyncFailedCallback = () -> Unit
 
@@ -36,7 +36,8 @@ class PomodoroManagerTest {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
             timerSyncer = timerSyncer,
-            updateCallback = updateCallback
+            onTimerCreated = { _, _ -> },
+            onStatusUpdated = updateCallback
         )
     }
 
@@ -75,7 +76,7 @@ class PomodoroManagerTest {
                 keyNotFoundCallback = any()
             )
         } answers {
-            capturedCreatedCallback.captured.invoke(timerPreference)
+            capturedCreatedCallback.captured.invoke(timerPreference, "sharing_key")
             capturedUpdateCallback.captured.invoke(expectedStatus)
         }
 

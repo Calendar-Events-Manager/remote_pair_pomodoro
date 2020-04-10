@@ -2,6 +2,7 @@ package com.mymeetings.pairpomodoro.service
 
 import android.os.*
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Command
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Reply
 
@@ -17,9 +18,19 @@ class ServiceMessenger(
     fun getBinder(): IBinder = receivingMessenger.binder
 
     fun sendPomodoroStatus(
-        sharingKey: String? = null,
         pomodoroStatus: PomodoroStatus? = null) {
-        sendMessage(MessengerProtocol.REPLY_STATUS, sharingKey, pomodoroStatus)
+        sendMessage(
+            reply = MessengerProtocol.REPLY_STATUS,
+            pomodoroStatus = pomodoroStatus
+        )
+    }
+
+    fun sendTimerCreated(timerPreference: TimerPreference, sharingKey: String) {
+        sendMessage(
+            reply = MessengerProtocol.REPLY_CREATED,
+            sharingKey = sharingKey,
+            timerPreference = timerPreference
+        )
     }
 
     fun sendKeyNotFound() {
@@ -29,13 +40,19 @@ class ServiceMessenger(
     /**
      * sharingKey is optional and should be only sent for pomodoro status.
      */
-    private fun sendMessage(@Reply reply: Int, sharingKey: String? = null, pomodoroStatus: PomodoroStatus? = null) {
+    private fun sendMessage(
+        @Reply reply: Int,
+        sharingKey: String? = null,
+        pomodoroStatus: PomodoroStatus? = null,
+        timerPreference: TimerPreference? = null
+    ) {
         val msg = Message.obtain()
 
         val bundle = Bundle()
         bundle.putInt(MessengerProtocol.REPLY_KEY, reply)
         bundle.putString(MessengerProtocol.SYNC_KEY, sharingKey)
         bundle.putParcelable(MessengerProtocol.STATUS_KEY, pomodoroStatus)
+        bundle.putParcelable(MessengerProtocol.PREFERENCE_KEY, timerPreference)
 
         msg.data = bundle
         msg.replyTo = receivingMessenger

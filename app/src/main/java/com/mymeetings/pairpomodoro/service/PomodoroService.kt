@@ -10,6 +10,7 @@ import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.AndroidTimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder
 import com.mymeetings.pairpomodoro.model.pomodoroSyncer.FirebaseTimerSyncer
 import com.mymeetings.pairpomodoro.view.NotificationUtils
 
@@ -23,6 +24,7 @@ class PomodoroService : Service() {
         PomodoroManager(
             AndroidTimerAlarm(this),
             FirebaseTimerSyncer(),
+            serviceMessenger::sendTimerCreated,
             ::onPomodoroStatusUpdate
         )
     }
@@ -95,27 +97,23 @@ class PomodoroService : Service() {
             checkAndUpdateCPUWake(pomodoroStatus)
         }
         this.pomodoroStatus = pomodoroStatus
-        serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
-    }
-
-    private fun onSharingFailed() {
-        serviceMessenger.sendKeyNotFound()
+        serviceMessenger.sendPomodoroStatus(pomodoroStatus)
     }
 
     private fun onCommandReceived(@MessengerProtocol.Command command: Int, sharingKey: String? = null) {
         when (command) {
             MessengerProtocol.COMMAND_HANDSHAKE -> {
-                serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
+                serviceMessenger.sendPomodoroStatus(pomodoroStatus)
             }
             MessengerProtocol.COMMAND_CREATE -> {
-                pomodoroManager.create(UserTimerPreference(this))
+                pomodoroManager.create(UserTimerPreferenceBuilder.build(this))
                 pomodoroManager.start()
             }
             MessengerProtocol.COMMAND_SYNC -> {
                 if (sharingKey != null) {
                     pomodoroManager.sync(
                         sharingKey,
-                        ::onSharingFailed
+                        serviceMessenger::sendKeyNotFound
                     )
                 }
             }
