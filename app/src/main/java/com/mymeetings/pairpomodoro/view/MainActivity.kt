@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         sharingKey: String
     ) {
         this.timerPreference = timerPreference
-        timerProgressBar.max = timerPreference.getFocusTime().toInt()
         sharingKeyText.text = sharingKey
     }
 
@@ -111,7 +110,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
 
         val balanceTime = pomodoroStatus?.balanceTime ?: 0
         countDownView.text = Utils.getDurationBreakdown(balanceTime)
-        timerProgressBar.progress = balanceTime.toInt()
 
         when {
             pomodoroStatus == null -> {
@@ -136,29 +134,29 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
 
         val startButtonTextString: String
         val modeTextString: String
-        val progresMaxValue: Long?
+        val progressMaxValue: Long?
 
         when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
             PomodoroState.Focus -> {
                 startButtonTextString = getString(R.string.start_focus)
                 modeTextString = getString(R.string.focus)
-                progresMaxValue = timerPreference?.getFocusTime()
+                progressMaxValue = timerPreference?.getFocusTime()
             }
             PomodoroState.ShortBreak -> {
                 startButtonTextString = getString(R.string.take_short_break)
                 modeTextString = getString(R.string.short_break)
-                progresMaxValue = timerPreference?.getShortBreakTime()
+                progressMaxValue = timerPreference?.getShortBreakTime()
             }
             PomodoroState.LongBreak -> {
                 startButtonTextString = getString(R.string.take_long_break)
                 modeTextString = getString(R.string.long_break)
-                progresMaxValue = timerPreference?.getLongBreakTime()
+                progressMaxValue = timerPreference?.getLongBreakTime()
             }
         }
 
         modeText.text = modeTextString
         startButton.text = startButtonTextString
-        progressBar.max = (progresMaxValue ?: 0).toInt()
+        timerProgressBar.progress = Utils.getPercentageValue(progressMaxValue ?: 0, balanceTime)
 
         container.keepScreenOn =
             PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)

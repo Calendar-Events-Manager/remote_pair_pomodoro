@@ -17,6 +17,14 @@ object Utils {
         return String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds)
     }
 
+    fun getPercentageValue(maxValue: Long, progressValue: Long) =
+        100.minus(
+            ((maxValue.minus(progressValue).toDouble()).div(maxValue)).times(
+                100
+            )
+        ).toInt()
+
+
     fun getRandomAlphaNumeric(): String {
         val allowedChars = "ABCDEFGHIJKLMNOPRSTUV"
         return getRandomFrom(allowedChars, 5)
