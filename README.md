@@ -1,4 +1,6 @@
-# remote_pair_pomodoro
+![CI](https://github.com/Calendar-Events-Manager/remote_pair_pomodoro/workflows/CI/badge.svg?branch=master)
+
+# Pomodoro App with Remote Sync
 Pomodoro app for Remote pair programming that syncs with other person in real time.
 
 App Download link : https://drive.google.com/open?id=1rP_TWHmhUcfSx61flZMpf2OB-5vtmICL
