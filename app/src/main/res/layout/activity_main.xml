@@ -58,7 +58,9 @@
             android:minHeight="240dp"
             android:layout_gravity="center"
             android:progressDrawable="@drawable/progress_circle"
-            android:max="100"
+            android:progressTint="@color/colorIcon"
+            android:max="10000"
+            tools:max="100"
             tools:progress="85" />
 
         <TextView

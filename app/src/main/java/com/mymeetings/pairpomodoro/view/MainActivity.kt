@@ -134,29 +134,29 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
 
         val startButtonTextString: String
         val modeTextString: String
-        val progressMaxValue: Long?
+        val timerFullTime: Long?
 
         when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
             PomodoroState.Focus -> {
                 startButtonTextString = getString(R.string.start_focus)
                 modeTextString = getString(R.string.focus)
-                progressMaxValue = timerPreference?.getFocusTime()
+                timerFullTime = timerPreference?.getFocusTime()
             }
             PomodoroState.ShortBreak -> {
                 startButtonTextString = getString(R.string.take_short_break)
                 modeTextString = getString(R.string.short_break)
-                progressMaxValue = timerPreference?.getShortBreakTime()
+                timerFullTime = timerPreference?.getShortBreakTime()
             }
             PomodoroState.LongBreak -> {
                 startButtonTextString = getString(R.string.take_long_break)
                 modeTextString = getString(R.string.long_break)
-                progressMaxValue = timerPreference?.getLongBreakTime()
+                timerFullTime = timerPreference?.getLongBreakTime()
             }
         }
 
         modeText.text = modeTextString
         startButton.text = startButtonTextString
-        timerProgressBar.progress = Utils.getPercentageValue(progressMaxValue ?: 0, balanceTime)
+        timerProgressBar.progress = Utils.getProportionalProgress(timerFullTime ?: 0, balanceTime)
 
         container.keepScreenOn =
             PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)
