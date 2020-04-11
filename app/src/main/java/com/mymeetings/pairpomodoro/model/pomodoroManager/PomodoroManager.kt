@@ -49,7 +49,7 @@ class PomodoroManager(
         onTimerCreated(timerPreference, sharingKey)
     }
 
-    fun getShareKey() = timerSyncer.getSharingKey()
+    fun getSharingKey() = timerSyncer.getSharingKey()
 
     fun start() {
         pomodoroTimer?.start()
@@ -70,6 +70,8 @@ class PomodoroManager(
         pomodoroTimer?.close()
         pomodoroTimer = null
     }
+
+    fun getTimerPreference() = pomodoroTimer?.timerPreference
 
     override fun update(pomodoroStatus: PomodoroStatus, actionChanges: Boolean) {
         onStatusUpdated.invoke(pomodoroStatus)

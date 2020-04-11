@@ -208,7 +208,7 @@ class PomodoroManagerTest {
     fun `getSharingKey should return sharing key registered in syncer`() {
         every { timerSyncer.getSharingKey() } returns sharingKey
 
-        val actualSharingKey = pomodoroManager.getShareKey()
+        val actualSharingKey = pomodoroManager.getSharingKey()
 
         assert(actualSharingKey == sharingKey)
     }

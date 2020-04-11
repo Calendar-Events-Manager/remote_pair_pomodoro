@@ -103,6 +103,11 @@ class PomodoroService : Service() {
     private fun onCommandReceived(@MessengerProtocol.Command command: Int, sharingKey: String? = null) {
         when (command) {
             MessengerProtocol.COMMAND_HANDSHAKE -> {
+                val timerPreference = pomodoroManager.getTimerPreference()
+                val timerSharingKey = pomodoroManager.getSharingKey()
+                timerPreference?.let {
+                    serviceMessenger.sendTimerCreated(timerPreference, timerSharingKey)
+                }
                 serviceMessenger.sendPomodoroStatus(pomodoroStatus)
             }
             MessengerProtocol.COMMAND_CREATE -> {
