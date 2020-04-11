@@ -3,6 +3,7 @@ package com.mymeetings.pairpomodoro.service
 import android.os.*
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Command
 
@@ -96,8 +97,9 @@ class ActivityMessenger(
                 }
                 MessengerProtocol.REPLY_CREATED -> {
                     val sharingKey = msg.data?.getString(MessengerProtocol.SYNC_KEY) ?: ""
-                    val preference = msg.data?.getParcelable(MessengerProtocol.PREFERENCE_KEY)
-                        ?: UserTimerPreferenceBuilder.buildDefault()
+                    val preference =
+                        msg.data?.getParcelable<UserTimerPreference>(MessengerProtocol.PREFERENCE_KEY)
+                            ?: UserTimerPreferenceBuilder.buildDefault()
                     onTimerCreated(preference, sharingKey)
                 }
             }

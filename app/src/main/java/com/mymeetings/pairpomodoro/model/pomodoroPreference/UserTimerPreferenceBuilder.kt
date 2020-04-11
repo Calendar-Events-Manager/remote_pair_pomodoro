@@ -31,6 +31,15 @@ class UserTimerPreferenceBuilder {
             )
         }
 
+        fun build(timerPreference: TimerPreference) =
+            UserTimerPreference(
+                focusTime = timerPreference.getFocusTime(),
+                shortBreakTime = timerPreference.getShortBreakTime(),
+                longBreakTime = timerPreference.getLongBreakTime(),
+                shortBreakCount = timerPreference.getShortBreakCount()
+            )
+
+
         fun buildDefault(): UserTimerPreference {
             return UserTimerPreference(
                 focusTime = TimeUnit.MINUTES.toMillis(25),

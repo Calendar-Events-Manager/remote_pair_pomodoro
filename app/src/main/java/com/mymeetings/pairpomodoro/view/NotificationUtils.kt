@@ -8,9 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.mymeetings.pairpomodoro.service.PomodoroService
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.service.PomodoroService
 
 object NotificationUtils {
 
@@ -60,6 +60,7 @@ object NotificationUtils {
             .setWhen(System.currentTimeMillis())
             .setSmallIcon(R.drawable.ic_stat_pomodoro)
             .setContentIntent(pendingIntent)
+            .setSound(null)
 
 
         when {

@@ -2,7 +2,8 @@ package com.mymeetings.pairpomodoro.service
 
 import android.os.*
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
-import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Command
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Reply
 
@@ -18,18 +19,19 @@ class ServiceMessenger(
     fun getBinder(): IBinder = receivingMessenger.binder
 
     fun sendPomodoroStatus(
-        pomodoroStatus: PomodoroStatus? = null) {
+        pomodoroStatus: PomodoroStatus? = null
+    ) {
         sendMessage(
             reply = MessengerProtocol.REPLY_STATUS,
             pomodoroStatus = pomodoroStatus
         )
     }
 
-    fun sendTimerCreated(timerPreference: TimerPreference, sharingKey: String) {
+    fun sendTimerCreated(timerPreference: UserTimerPreference, sharingKey: String) {
         sendMessage(
             reply = MessengerProtocol.REPLY_CREATED,
             sharingKey = sharingKey,
-            timerPreference = timerPreference
+            timerPreference = UserTimerPreferenceBuilder.build(timerPreference)
         )
     }
 
@@ -44,7 +46,7 @@ class ServiceMessenger(
         @Reply reply: Int,
         sharingKey: String? = null,
         pomodoroStatus: PomodoroStatus? = null,
-        timerPreference: TimerPreference? = null
+        timerPreference: UserTimerPreference? = null
     ) {
         val msg = Message.obtain()
 

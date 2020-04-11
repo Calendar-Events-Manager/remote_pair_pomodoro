@@ -9,7 +9,7 @@ import android.os.PowerManager.PARTIAL_WAKE_LOCK
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.AndroidTimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
-import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder
 import com.mymeetings.pairpomodoro.model.pomodoroSyncer.FirebaseTimerSyncer
 import com.mymeetings.pairpomodoro.view.NotificationUtils
@@ -24,7 +24,7 @@ class PomodoroService : Service() {
         PomodoroManager(
             AndroidTimerAlarm(this),
             FirebaseTimerSyncer(),
-            serviceMessenger::sendTimerCreated,
+            ::onTimerCreated,
             ::onPomodoroStatusUpdate
         )
     }
@@ -91,6 +91,13 @@ class PomodoroService : Service() {
         return START_NOT_STICKY
     }
 
+    private fun onTimerCreated(timerPreference: TimerPreference, sharingKey: String) {
+        serviceMessenger.sendTimerCreated(
+            UserTimerPreferenceBuilder.build(timerPreference),
+            sharingKey
+        )
+    }
+
     private fun onPomodoroStatusUpdate(pomodoroStatus: PomodoroStatus) {
         if (this.pomodoroStatus?.pause != pomodoroStatus.pause) {
             checkAndUpdateNotification(pomodoroStatus)
@@ -106,7 +113,7 @@ class PomodoroService : Service() {
                 val timerPreference = pomodoroManager.getTimerPreference()
                 val timerSharingKey = pomodoroManager.getSharingKey()
                 timerPreference?.let {
-                    serviceMessenger.sendTimerCreated(timerPreference, timerSharingKey)
+                    onTimerCreated(timerPreference, timerSharingKey)
                 }
                 serviceMessenger.sendPomodoroStatus(pomodoroStatus)
             }
@@ -198,7 +205,6 @@ class PomodoroService : Service() {
                     TIMER_TYPE_EXIT
                 )
             }
-
     }
 
 }
