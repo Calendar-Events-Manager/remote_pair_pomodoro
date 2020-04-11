@@ -8,7 +8,7 @@ import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 
 class PomodoroTimer(
     private val tickerRunner: TickerRunner,
-    private val timerPreference: TimerPreference,
+    val timerPreference: TimerPreference,
     private val timerAlarm: TimerAlarm,
     private val timerUpdater: TimerUpdater
 ) : Ticker {

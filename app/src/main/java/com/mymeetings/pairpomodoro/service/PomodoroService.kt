@@ -9,7 +9,8 @@ import android.os.PowerManager.PARTIAL_WAKE_LOCK
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroAlarm.AndroidTimerAlarm
 import com.mymeetings.pairpomodoro.model.pomodoroManager.PomodoroManager
-import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder
 import com.mymeetings.pairpomodoro.model.pomodoroSyncer.FirebaseTimerSyncer
 import com.mymeetings.pairpomodoro.view.NotificationUtils
 
@@ -23,6 +24,7 @@ class PomodoroService : Service() {
         PomodoroManager(
             AndroidTimerAlarm(this),
             FirebaseTimerSyncer(),
+            ::onTimerCreated,
             ::onPomodoroStatusUpdate
         )
     }
@@ -89,33 +91,41 @@ class PomodoroService : Service() {
         return START_NOT_STICKY
     }
 
+    private fun onTimerCreated(timerPreference: TimerPreference, sharingKey: String) {
+        serviceMessenger.sendTimerCreated(
+            UserTimerPreferenceBuilder.build(timerPreference),
+            sharingKey
+        )
+    }
+
     private fun onPomodoroStatusUpdate(pomodoroStatus: PomodoroStatus) {
         if (this.pomodoroStatus?.pause != pomodoroStatus.pause) {
             checkAndUpdateNotification(pomodoroStatus)
             checkAndUpdateCPUWake(pomodoroStatus)
         }
         this.pomodoroStatus = pomodoroStatus
-        serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
-    }
-
-    private fun onSharingFailed() {
-        serviceMessenger.sendKeyNotFound()
+        serviceMessenger.sendPomodoroStatus(pomodoroStatus)
     }
 
     private fun onCommandReceived(@MessengerProtocol.Command command: Int, sharingKey: String? = null) {
         when (command) {
             MessengerProtocol.COMMAND_HANDSHAKE -> {
-                serviceMessenger.sendPomodoroStatus(pomodoroManager.getShareKey(), pomodoroStatus)
+                val timerPreference = pomodoroManager.getTimerPreference()
+                val timerSharingKey = pomodoroManager.getSharingKey()
+                timerPreference?.let {
+                    onTimerCreated(timerPreference, timerSharingKey)
+                }
+                serviceMessenger.sendPomodoroStatus(pomodoroStatus)
             }
             MessengerProtocol.COMMAND_CREATE -> {
-                pomodoroManager.create(UserTimerPreference(this))
+                pomodoroManager.create(UserTimerPreferenceBuilder.build(this))
                 pomodoroManager.start()
             }
             MessengerProtocol.COMMAND_SYNC -> {
                 if (sharingKey != null) {
                     pomodoroManager.sync(
                         sharingKey,
-                        ::onSharingFailed
+                        serviceMessenger::sendKeyNotFound
                     )
                 }
             }
@@ -195,7 +205,6 @@ class PomodoroService : Service() {
                     TIMER_TYPE_EXIT
                 )
             }
-
     }
 
 }

@@ -1,6 +1,8 @@
 package com.mymeetings.pairpomodoro.model.pomodoroPreference
 
-interface TimerPreference {
+import android.os.Parcelable
+
+interface TimerPreference: Parcelable {
 
     fun getFocusTime() : Long
 

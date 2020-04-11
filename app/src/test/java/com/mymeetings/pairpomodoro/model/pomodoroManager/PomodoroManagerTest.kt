@@ -11,7 +11,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import org.junit.Before
 import org.junit.Test
 
-typealias CreationCallback = (TimerPreference) -> Unit
+typealias CreationCallback = (TimerPreference, String) -> Unit
 typealias UpdateCallback = (PomodoroStatus) -> Unit
 typealias SyncFailedCallback = () -> Unit
 
@@ -28,15 +28,19 @@ class PomodoroManagerTest {
     private lateinit var timerSyncer: TimerSyncer
     @MockK
     private lateinit var updateCallback: ((PomodoroStatus) -> Unit)
+    @MockK
+    private lateinit var createdCallback : ((TimerPreference, sharingKey : String) -> Unit)
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         every { updateCallback.invoke(any()) } just Runs
+        every { createdCallback.invoke(any(), any()) } just Runs
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
             timerSyncer = timerSyncer,
-            updateCallback = updateCallback
+            onTimerCreated = createdCallback,
+            onStatusUpdated = updateCallback
         )
     }
 
@@ -50,6 +54,7 @@ class PomodoroManagerTest {
                 sharingKey = any(),
                 statusCallback = any()
             )
+            createdCallback.invoke(timerPreference, any())
         }
     }
 
@@ -75,7 +80,7 @@ class PomodoroManagerTest {
                 keyNotFoundCallback = any()
             )
         } answers {
-            capturedCreatedCallback.captured.invoke(timerPreference)
+            capturedCreatedCallback.captured.invoke(timerPreference, sharingKey)
             capturedUpdateCallback.captured.invoke(expectedStatus)
         }
 
@@ -88,6 +93,7 @@ class PomodoroManagerTest {
                 createdCallback = any(),
                 keyNotFoundCallback = any()
             )
+            createdCallback.invoke(timerPreference, sharingKey)
             updateCallback.invoke(expectedStatus)
         }
         verify(exactly = 0) {
@@ -203,7 +209,7 @@ class PomodoroManagerTest {
     fun `getSharingKey should return sharing key registered in syncer`() {
         every { timerSyncer.getSharingKey() } returns sharingKey
 
-        val actualSharingKey = pomodoroManager.getShareKey()
+        val actualSharingKey = pomodoroManager.getSharingKey()
 
         assert(actualSharingKey == sharingKey)
     }

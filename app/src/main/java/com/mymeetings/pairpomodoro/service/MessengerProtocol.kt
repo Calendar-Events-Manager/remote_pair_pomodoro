@@ -4,6 +4,7 @@ import androidx.annotation.IntDef
 
 object MessengerProtocol {
 
+    const val PREFERENCE_KEY = "preference"
     const val STATUS_KEY = "status"
     const val COMMAND_TYPE_KEY = "command"
     const val SYNC_KEY = "sync_key"
@@ -23,6 +24,7 @@ object MessengerProtocol {
     annotation class Command
 
 
+    @Reply const val REPLY_CREATED = 0
     @Reply const val REPLY_STATUS = 1
     @Reply const val REPLY_NOT_FOUND = 2
 

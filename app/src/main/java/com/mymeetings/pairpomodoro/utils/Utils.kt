@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit
 
 object Utils {
 
+    private const val PROGRESS_BAR_MAX = 10_000L
+
     fun getDurationBreakdown(diff: Long): String {
         var millis = diff
         if (millis < 0) {
@@ -16,6 +18,16 @@ object Utils {
         val seconds: Long = TimeUnit.MILLISECONDS.toSeconds(millis)
         return String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds)
     }
+
+    fun getProportionalProgress(
+        timerFullTime: Long,
+        timerBalanceTime: Long,
+        progressBarMax: Long = PROGRESS_BAR_MAX
+    ) = timerBalanceTime.toDouble()
+        .div(timerFullTime)
+        .times(progressBarMax)
+        .toInt()
+
 
     fun getRandomAlphaNumeric(): String {
         val allowedChars = "ABCDEFGHIJKLMNOPRSTUV"

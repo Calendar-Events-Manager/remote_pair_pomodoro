@@ -2,15 +2,25 @@ package com.mymeetings.pairpomodoro.service
 
 import android.os.*
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreference
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder
 import com.mymeetings.pairpomodoro.service.MessengerProtocol.Command
 
 class ActivityMessenger(
-    statusCallback: (pomodoroStatus: PomodoroStatus?, sharingKey: String?) -> Unit,
-    keyNotFoundCallback: (() -> Unit)
+    onTimerCreated: (TimerPreference, sharingKey: String) -> Unit,
+    onStatusUpdated: (pomodoroStatus: PomodoroStatus?) -> Unit,
+    onKeyNotFound: () -> Unit
 ) {
 
     private var sendingMessenger: Messenger? = null
-    private val receivingMessenger = Messenger(ReplyHandler(statusCallback, keyNotFoundCallback))
+    private val receivingMessenger = Messenger(
+        ReplyHandler(
+            onTimerCreated,
+            onStatusUpdated,
+            onKeyNotFound
+        )
+    )
 
     fun onConnect(messenger: Messenger) {
         this.sendingMessenger = messenger
@@ -69,8 +79,9 @@ class ActivityMessenger(
     }
 
     internal class ReplyHandler(
-        private val statusCallback: (pomodoroStatus: PomodoroStatus?, sharingKey: String?) -> Unit,
-        private val keyNotFoundCallback: (() -> Unit)
+        private val onTimerCreated: (TimerPreference, sharingKey: String) -> Unit,
+        private val onStatusUpdated: (pomodoroStatus: PomodoroStatus?) -> Unit,
+        private val onKeyNotFound: () -> Unit
     ) : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
@@ -79,11 +90,17 @@ class ActivityMessenger(
                 MessengerProtocol.REPLY_STATUS -> {
                     val pomodoroStatus =
                         msg.data?.getParcelable<PomodoroStatus>(MessengerProtocol.STATUS_KEY)
-                    val sharingKey = msg.data?.getString(MessengerProtocol.SYNC_KEY)
-                    statusCallback.invoke(pomodoroStatus, sharingKey)
+                    onStatusUpdated.invoke(pomodoroStatus)
                 }
                 MessengerProtocol.REPLY_NOT_FOUND -> {
-                    keyNotFoundCallback.invoke()
+                    onKeyNotFound.invoke()
+                }
+                MessengerProtocol.REPLY_CREATED -> {
+                    val sharingKey = msg.data?.getString(MessengerProtocol.SYNC_KEY) ?: ""
+                    val preference =
+                        msg.data?.getParcelable<UserTimerPreference>(MessengerProtocol.PREFERENCE_KEY)
+                            ?: UserTimerPreferenceBuilder.buildDefault()
+                    onTimerCreated(preference, sharingKey)
                 }
             }
         }

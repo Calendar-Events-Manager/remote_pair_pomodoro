@@ -14,7 +14,7 @@ import com.mymeetings.pairpomodoro.utils.Utils
 
 class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
 
-    private var createdCallback: ((TimerPreference) -> Unit)? = null
+    private var createdCallback: ((TimerPreference, String) -> Unit)? = null
     private var statusCallback: ((PomodoroStatus) -> Unit)? = null
     private var keyNotFoundCallback: (() -> Unit)? = null
     private var sharingKey: String? = null
@@ -22,7 +22,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
 
     override fun registerTimerUpdate(
         sharingKey: String,
-        createdCallback: ((TimerPreference) -> Unit)?,
+        createdCallback: ((TimerPreference, String) -> Unit)?,
         statusCallback: ((PomodoroStatus) -> Unit)?,
         keyNotFoundCallback: (() -> Unit)?
     ) {
@@ -81,7 +81,7 @@ class FirebaseTimerSyncer : TimerSyncer, ValueEventListener {
                 sharingKey?.let {
                     getInfoDBReference(it).removeEventListener(this)
                     getSyncDBReference(it).addValueEventListener(this)
-                    createdCallback?.invoke(timerPreference)
+                    createdCallback?.invoke(timerPreference, it)
                 }
             } else {
                 keyNotFoundCallback?.invoke()

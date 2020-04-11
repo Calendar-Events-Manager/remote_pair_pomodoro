@@ -1,8 +1,10 @@
 package com.mymeetings.pairpomodoro.model.pomodoroPreference
 
 import com.google.firebase.database.PropertyName
+import kotlinx.android.parcel.Parcelize
 import java.util.concurrent.TimeUnit
 
+@Parcelize
 data class SyncableTimerPreference(
     @PropertyName("focusTime") private val focusTime: Long = TimeUnit.MINUTES.toMillis(25),
     @PropertyName("shortBreakTime") private val shortBreakTime: Long = TimeUnit.MINUTES.toMillis(3),

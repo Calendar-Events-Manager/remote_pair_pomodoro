@@ -12,16 +12,22 @@ import androidx.preference.PreferenceManager
 import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomodoroState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
+import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
 import com.mymeetings.pairpomodoro.service.ActivityMessenger
 import com.mymeetings.pairpomodoro.service.PomodoroService
 import com.mymeetings.pairpomodoro.utils.Utils
 import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity(), ServiceConnection {
 
-    private val activityMessenger = ActivityMessenger(::showStatus, ::keyNotFound)
+    private var timerPreference: TimerPreference? = null
+
+    private val activityMessenger = ActivityMessenger(
+        ::onTimerCreated,
+        ::onStatusUpdated,
+        ::onKeyNotFound
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,29 +81,35 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         startService(Intent(this, PomodoroService::class.java))
     }
 
-    private fun showStatus(pomodoroStatus: PomodoroStatus?, sharingKey: String?) {
+    private fun onStatusUpdated(pomodoroStatus: PomodoroStatus?) {
         if (pomodoroStatus != null) {
-            showTimerView(pomodoroStatus, sharingKey)
+            showTimerView(pomodoroStatus)
         } else {
             showSelectionView()
         }
     }
 
-    private fun keyNotFound() {
+    private fun onTimerCreated(
+        timerPreference: TimerPreference,
+        sharingKey: String
+    ) {
+        this.timerPreference = timerPreference
+        sharingKeyText.text = sharingKey
+    }
+
+    private fun onKeyNotFound() {
         ViewUtils.infoDialog(this, "Timer not available for this key") {
             activityMessenger.closePomodoro()
         }
     }
 
-    private fun showTimerView(
-        pomodoroStatus: PomodoroStatus? = null,
-        sharingKey: String? = null
-    ) {
+    private fun showTimerView(pomodoroStatus: PomodoroStatus? = null) {
 
         timerLayout.visible()
         selectionLayout.gone()
 
-        countDownView.text = Utils.getDurationBreakdown(pomodoroStatus?.balanceTime ?: 0)
+        val balanceTime = pomodoroStatus?.balanceTime ?: 0
+        countDownView.text = Utils.getDurationBreakdown(balanceTime)
 
         when {
             pomodoroStatus == null -> {
@@ -120,34 +132,31 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
             }
         }
 
-        sharingKeyText.text = sharingKey ?: ""
+        val startButtonTextString: String
+        val modeTextString: String
+        val timerFullTime: Long?
 
-        val mode = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
+        when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
             PomodoroState.Focus -> {
-                "Focus"
-            }
-            PomodoroState.LongBreak -> {
-                "Long Break"
+                startButtonTextString = getString(R.string.start_focus)
+                modeTextString = getString(R.string.focus)
+                timerFullTime = timerPreference?.getFocusTime()
             }
             PomodoroState.ShortBreak -> {
-                "Short Break"
-            }
-        }
-        modeText.text = mode
-
-        val startText = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
-            PomodoroState.Focus -> {
-                "Start Focus"
+                startButtonTextString = getString(R.string.take_short_break)
+                modeTextString = getString(R.string.short_break)
+                timerFullTime = timerPreference?.getShortBreakTime()
             }
             PomodoroState.LongBreak -> {
-                "Take Long Break"
-            }
-            PomodoroState.ShortBreak -> {
-                "Take Short Break"
+                startButtonTextString = getString(R.string.take_long_break)
+                modeTextString = getString(R.string.long_break)
+                timerFullTime = timerPreference?.getLongBreakTime()
             }
         }
-        startButton.text = startText
 
+        modeText.text = modeTextString
+        startButton.text = startButtonTextString
+        timerProgressBar.progress = Utils.getProportionalProgress(timerFullTime ?: 0, balanceTime)
 
         container.keepScreenOn =
             PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)
