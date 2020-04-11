@@ -21,6 +21,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), ServiceConnection {
 
+    private var timerPreference: TimerPreference? = null
+
     private val activityMessenger = ActivityMessenger(
         ::onTimerCreated,
         ::onStatusUpdated,
@@ -91,6 +93,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         timerPreference: TimerPreference,
         sharingKey: String
     ) {
+        this.timerPreference = timerPreference
         timerProgressBar.max = timerPreference.getFocusTime().toInt()
         sharingKeyText.text = sharingKey
     }
@@ -131,32 +134,31 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
             }
         }
 
-        val mode = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
+        val startButtonTextString: String
+        val modeTextString: String
+        val progresMaxValue: Long?
+
+        when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
             PomodoroState.Focus -> {
-                "Focus"
-            }
-            PomodoroState.LongBreak -> {
-                "Long Break"
+                startButtonTextString = getString(R.string.start_focus)
+                modeTextString = getString(R.string.focus)
+                progresMaxValue = timerPreference?.getFocusTime()
             }
             PomodoroState.ShortBreak -> {
-                "Short Break"
-            }
-        }
-        modeText.text = mode
-
-        val startText = when (pomodoroStatus?.pomodoroState ?: PomodoroState.Focus) {
-            PomodoroState.Focus -> {
-                "Start Focus"
+                startButtonTextString = getString(R.string.take_short_break)
+                modeTextString = getString(R.string.short_break)
+                progresMaxValue = timerPreference?.getShortBreakTime()
             }
             PomodoroState.LongBreak -> {
-                "Take Long Break"
-            }
-            PomodoroState.ShortBreak -> {
-                "Take Short Break"
+                startButtonTextString = getString(R.string.take_long_break)
+                modeTextString = getString(R.string.long_break)
+                progresMaxValue = timerPreference?.getLongBreakTime()
             }
         }
-        startButton.text = startText
 
+        modeText.text = modeTextString
+        startButton.text = startButtonTextString
+        progressBar.max = (progresMaxValue ?: 0).toInt()
 
         container.keepScreenOn =
             PreferenceManager.getDefaultSharedPreferences(this).getBoolean("screen_on", true)
