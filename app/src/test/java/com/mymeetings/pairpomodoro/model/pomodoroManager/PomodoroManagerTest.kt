@@ -35,6 +35,7 @@ class PomodoroManagerTest {
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         every { updateCallback.invoke(any()) } just Runs
+        every { createdCallback.invoke(any(), any()) } just Runs
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
             timerSyncer = timerSyncer,
@@ -79,7 +80,7 @@ class PomodoroManagerTest {
                 keyNotFoundCallback = any()
             )
         } answers {
-            capturedCreatedCallback.captured.invoke(timerPreference, "sharing_key")
+            capturedCreatedCallback.captured.invoke(timerPreference, sharingKey)
             capturedUpdateCallback.captured.invoke(expectedStatus)
         }
 
