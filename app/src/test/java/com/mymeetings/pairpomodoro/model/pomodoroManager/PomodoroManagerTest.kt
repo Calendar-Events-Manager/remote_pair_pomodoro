@@ -28,6 +28,8 @@ class PomodoroManagerTest {
     private lateinit var timerSyncer: TimerSyncer
     @MockK
     private lateinit var updateCallback: ((PomodoroStatus) -> Unit)
+    @MockK
+    private lateinit var createdCallback : ((TimerPreference, sharingKey : String) -> Unit)
 
     @Before
     fun setup() {
@@ -36,7 +38,7 @@ class PomodoroManagerTest {
         pomodoroManager = PomodoroManager(
             timerAlarm = timerAlarm,
             timerSyncer = timerSyncer,
-            onTimerCreated = { _, _ -> },
+            onTimerCreated = createdCallback,
             onStatusUpdated = updateCallback
         )
     }
@@ -51,6 +53,7 @@ class PomodoroManagerTest {
                 sharingKey = any(),
                 statusCallback = any()
             )
+            createdCallback.invoke(timerPreference, any())
         }
     }
 
@@ -89,6 +92,7 @@ class PomodoroManagerTest {
                 createdCallback = any(),
                 keyNotFoundCallback = any()
             )
+            createdCallback.invoke(timerPreference, sharingKey)
             updateCallback.invoke(expectedStatus)
         }
         verify(exactly = 0) {

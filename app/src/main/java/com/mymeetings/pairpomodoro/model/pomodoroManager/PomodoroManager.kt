@@ -13,7 +13,7 @@ import com.mymeetings.pairpomodoro.utils.Utils
 class PomodoroManager(
     private val timerAlarm: TimerAlarm,
     private val timerSyncer: TimerSyncer,
-    val onTimerCreated: (TimerPreference, String) -> Unit,
+    private val onTimerCreated: (TimerPreference, String) -> Unit,
     private val onStatusUpdated: (pomodoroStatus: PomodoroStatus) -> Unit
 ) : TimerUpdater {
 

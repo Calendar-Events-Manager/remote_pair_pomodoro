@@ -13,14 +13,11 @@ import com.mymeetings.pairpomodoro.R
 import com.mymeetings.pairpomodoro.model.PomodoroState
 import com.mymeetings.pairpomodoro.model.PomodoroStatus
 import com.mymeetings.pairpomodoro.model.pomodoroPreference.TimerPreference
-import com.mymeetings.pairpomodoro.model.pomodoroPreference.UserTimerPreferenceBuilder.Companion.FOCUS_TIME_KEY
 import com.mymeetings.pairpomodoro.service.ActivityMessenger
 import com.mymeetings.pairpomodoro.service.PomodoroService
 import com.mymeetings.pairpomodoro.utils.Utils
 import com.mymeetings.pairpomodoro.view.preference.PreferenceActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.concurrent.TimeUnit
-
 
 class MainActivity : AppCompatActivity(), ServiceConnection {
 
@@ -170,14 +167,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         bindService(Intent(this, PomodoroService::class.java), this, Context.BIND_AUTO_CREATE)
     }
 
-    override fun onResume() {
-        super.onResume()
-        timerProgressBar.max =
-            TimeUnit.MINUTES.toMillis(
-                PreferenceManager.getDefaultSharedPreferences(this).getInt(FOCUS_TIME_KEY, 25).toLong()
-            ).toInt()
-    }
-
     override fun onStop() {
         super.onStop()
         unbindService(this)
@@ -196,10 +185,5 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         activityMessenger.onConnect(Messenger(service))
         activityMessenger.handShake()
-    }
-
-    companion object {
-        private const val TIMER_PROGRESS_BAR_MAX = "TIMER_PROGRESS_BAR_MAX"
-        private const val TIMER_PROGRESS_BAR_PROGRESS = "TIMER_PROGRESS_BAR_PROGRESS"
     }
 }

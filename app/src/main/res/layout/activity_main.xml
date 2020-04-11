@@ -49,14 +49,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center">
 
-        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        <ProgressBar
             android:id="@+id/timerProgressBar"
-            style="@style/Widget.MaterialProgressBar.ProgressBar"
-            android:progressTint="@color/colorIcon"
-            android:minWidth="306dp"
-            android:minHeight="306dp"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="330dp"
+            android:minHeight="330dp"
+            android:layout_gravity="center"
+            android:progressDrawable="@drawable/progress_circle"
             tools:max="100"
             tools:progress="65"/>
 
