@@ -7,10 +7,6 @@ App Download link : https://drive.google.com/open?id=1rP_TWHmhUcfSx61flZMpf2OB-5
 
 App screenshots
 
-![Menu Screen](https://raw.githubusercontent.com/praslnx8/remote_pair_pomodoro/master/docs/menu_screen.png)
-
 ![Timer Running](https://raw.githubusercontent.com/praslnx8/remote_pair_pomodoro/master/docs/timer_running.png)
-
-![Preferences](https://raw.githubusercontent.com/praslnx8/remote_pair_pomodoro/master/docs/preferences.png)
 
 ![Timer paused](https://raw.githubusercontent.com/praslnx8/remote_pair_pomodoro/master/docs/timer_paused.png)
